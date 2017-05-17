@@ -1,0 +1,285 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+      <Schema Namespace="FacesModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="__MigrationHistory">
+          <Key>
+            <PropertyRef Name="MigrationId" />
+            <PropertyRef Name="ContextKey" />
+          </Key>
+          <Property Name="MigrationId" Type="nvarchar" MaxLength="150" Nullable="false" />
+          <Property Name="ContextKey" Type="nvarchar" MaxLength="300" Nullable="false" />
+          <Property Name="Model" Type="varbinary(max)" Nullable="false" />
+          <Property Name="ProductVersion" Type="nvarchar" MaxLength="32" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Baskets">
+          <Key>
+            <PropertyRef Name="BasketID" />
+          </Key>
+          <Property Name="BasketID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="CurrentZone" Type="int" />
+          <Property Name="LastZone" Type="int" />
+          <Property Name="LastZoneUpdate" Type="datetime" />
+          <Property Name="BatteryLevel" Type="float" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'Faces.dbo.Configuration' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="Configuration">
+          <Key>
+            <PropertyRef Name="Key" />
+            <PropertyRef Name="Value" />
+            <PropertyRef Name="LastUpdate" />
+            <PropertyRef Name="UpdatedBy" />
+          </Key>
+          <Property Name="Key" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="Value" Type="varchar(max)" Nullable="false" />
+          <Property Name="LastUpdate" Type="datetime" Nullable="false" />
+          <Property Name="UpdatedBy" Type="varchar" MaxLength="50" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Faces">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Age" Type="float" />
+          <Property Name="Gender" Type="char" MaxLength="1" />
+          <Property Name="Eyeglasses" Type="bit" />
+          <Property Name="Beard" Type="float" />
+          <Property Name="Mustaches" Type="float" />
+          <Property Name="Faceid" Type="char" MaxLength="36" Nullable="false" />
+          <Property Name="EntranceTimestamp" Type="datetime" Nullable="false" />
+          <Property Name="EntranceCamera" Type="int" Nullable="false" />
+          <Property Name="ExitTimestamp" Type="datetime" />
+          <Property Name="ExitCamera" Type="int" />
+          <Property Name="IsDeduplicated" Type="bit" Nullable="false" />
+          <Property Name="VisitDurationInSeconds" Type="int" StoreGeneratedPattern="Computed" />
+        </EntityType>
+        <EntityType Name="StoreTree">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Name" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="Description" Type="varchar" MaxLength="255" />
+          <Property Name="IsCamera" Type="bit" Nullable="false" />
+          <Property Name="IsZone" Type="bit" Nullable="false" />
+          <Property Name="FatherID" Type="int" />
+        </EntityType>
+        <EntityType Name="ZoneMonitoring">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="BasketID" Type="int" Nullable="false" />
+          <Property Name="ZoneID" Type="int" Nullable="false" />
+          <Property Name="EntranceTimestamp" Type="datetime" Nullable="false" />
+          <Property Name="ExitTimestamp" Type="datetime" />
+          <Property Name="Duration" Type="int" StoreGeneratedPattern="Computed" />
+        </EntityType>
+        <EntityContainer Name="FacesModelStoreContainer">
+          <EntitySet Name="__MigrationHistory" EntityType="Self.__MigrationHistory" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Baskets" EntityType="Self.Baskets" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Faces" EntityType="Self.Faces" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="StoreTree" EntityType="Self.StoreTree" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ZoneMonitoring" EntityType="Self.ZoneMonitoring" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Configuration" EntityType="Self.Configuration" store:Type="Tables" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [Configuration].[Key] AS [Key], 
+    [Configuration].[Value] AS [Value], 
+    [Configuration].[LastUpdate] AS [LastUpdate], 
+    [Configuration].[UpdatedBy] AS [UpdatedBy]
+    FROM [dbo].[Configuration] AS [Configuration]</DefiningQuery>
+          </EntitySet>
+        </EntityContainer>
+      </Schema>
+    </edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="FacesModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="C__MigrationHistory">
+          <Key>
+            <PropertyRef Name="MigrationId" />
+            <PropertyRef Name="ContextKey" />
+          </Key>
+          <Property Name="MigrationId" Type="String" MaxLength="150" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="ContextKey" Type="String" MaxLength="300" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Model" Type="Binary" MaxLength="Max" FixedLength="false" Nullable="false" />
+          <Property Name="ProductVersion" Type="String" MaxLength="32" FixedLength="false" Unicode="true" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Basket">
+          <Key>
+            <PropertyRef Name="BasketID" />
+          </Key>
+          <Property Name="BasketID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="CurrentZone" Type="Int32" />
+          <Property Name="LastZone" Type="Int32" />
+          <Property Name="LastZoneUpdate" Type="DateTime" Precision="3" />
+          <Property Name="BatteryLevel" Type="Double" />
+        </EntityType>
+        <EntityType Name="Face">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Age" Type="Double" />
+          <Property Name="Gender" Type="String" MaxLength="1" FixedLength="true" Unicode="false" />
+          <Property Name="Eyeglasses" Type="Boolean" />
+          <Property Name="Beard" Type="Double" />
+          <Property Name="Mustaches" Type="Double" />
+          <Property Name="Faceid" Type="String" MaxLength="36" FixedLength="true" Unicode="false" Nullable="false" />
+          <Property Name="EntranceTimestamp" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="EntranceCamera" Type="Int32" Nullable="false" />
+          <Property Name="ExitTimestamp" Type="DateTime" Precision="3" />
+          <Property Name="ExitCamera" Type="Int32" />
+          <Property Name="IsDeduplicated" Type="Boolean" Nullable="false" />
+          <Property Name="VisitDurationInSeconds" Type="Int32" annotation:StoreGeneratedPattern="Computed" />
+        </EntityType>
+        <EntityType Name="StoreTree">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="Description" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="IsCamera" Type="Boolean" Nullable="false" />
+          <Property Name="IsZone" Type="Boolean" Nullable="false" />
+          <Property Name="FatherID" Type="Int32" />
+        </EntityType>
+        <EntityType Name="ZoneMonitoring">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="BasketID" Type="Int32" Nullable="false" />
+          <Property Name="ZoneID" Type="Int32" Nullable="false" />
+          <Property Name="EntranceTimestamp" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="ExitTimestamp" Type="DateTime" Precision="3" />
+          <Property Name="Duration" Type="Int32" annotation:StoreGeneratedPattern="Computed" />
+        </EntityType>
+        <EntityType Name="Configuration">
+          <Key>
+            <PropertyRef Name="Key" />
+            <PropertyRef Name="Value" />
+            <PropertyRef Name="LastUpdate" />
+            <PropertyRef Name="UpdatedBy" />
+          </Key>
+          <Property Name="Key" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="Value" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="LastUpdate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="UpdatedBy" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+        </EntityType>
+        <EntityContainer Name="FacesEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="C__MigrationHistory" EntityType="Self.C__MigrationHistory" />
+          <EntitySet Name="Baskets" EntityType="Self.Basket" />
+          <EntitySet Name="Faces" EntityType="Self.Face" />
+          <EntitySet Name="StoreTrees" EntityType="Self.StoreTree" />
+          <EntitySet Name="ZoneMonitorings" EntityType="Self.ZoneMonitoring" />
+          <EntitySet Name="Configurations" EntityType="Self.Configuration" />
+        </EntityContainer>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="FacesModelStoreContainer" CdmEntityContainer="FacesEntities">
+          <EntitySetMapping Name="C__MigrationHistory">
+            <EntityTypeMapping TypeName="FacesModel.C__MigrationHistory">
+              <MappingFragment StoreEntitySet="__MigrationHistory">
+                <ScalarProperty Name="MigrationId" ColumnName="MigrationId" />
+                <ScalarProperty Name="ContextKey" ColumnName="ContextKey" />
+                <ScalarProperty Name="Model" ColumnName="Model" />
+                <ScalarProperty Name="ProductVersion" ColumnName="ProductVersion" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Baskets">
+            <EntityTypeMapping TypeName="FacesModel.Basket">
+              <MappingFragment StoreEntitySet="Baskets">
+                <ScalarProperty Name="BasketID" ColumnName="BasketID" />
+                <ScalarProperty Name="CurrentZone" ColumnName="CurrentZone" />
+                <ScalarProperty Name="LastZone" ColumnName="LastZone" />
+                <ScalarProperty Name="LastZoneUpdate" ColumnName="LastZoneUpdate" />
+                <ScalarProperty Name="BatteryLevel" ColumnName="BatteryLevel" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Faces">
+            <EntityTypeMapping TypeName="FacesModel.Face">
+              <MappingFragment StoreEntitySet="Faces">
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="Age" ColumnName="Age" />
+                <ScalarProperty Name="Gender" ColumnName="Gender" />
+                <ScalarProperty Name="Eyeglasses" ColumnName="Eyeglasses" />
+                <ScalarProperty Name="Beard" ColumnName="Beard" />
+                <ScalarProperty Name="Mustaches" ColumnName="Mustaches" />
+                <ScalarProperty Name="Faceid" ColumnName="Faceid" />
+                <ScalarProperty Name="EntranceTimestamp" ColumnName="EntranceTimestamp" />
+                <ScalarProperty Name="EntranceCamera" ColumnName="EntranceCamera" />
+                <ScalarProperty Name="ExitTimestamp" ColumnName="ExitTimestamp" />
+                <ScalarProperty Name="ExitCamera" ColumnName="ExitCamera" />
+                <ScalarProperty Name="IsDeduplicated" ColumnName="IsDeduplicated" />
+                <ScalarProperty Name="VisitDurationInSeconds" ColumnName="VisitDurationInSeconds" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="StoreTrees">
+            <EntityTypeMapping TypeName="FacesModel.StoreTree">
+              <MappingFragment StoreEntitySet="StoreTree">
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="Description" ColumnName="Description" />
+                <ScalarProperty Name="IsCamera" ColumnName="IsCamera" />
+                <ScalarProperty Name="IsZone" ColumnName="IsZone" />
+                <ScalarProperty Name="FatherID" ColumnName="FatherID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ZoneMonitorings">
+            <EntityTypeMapping TypeName="FacesModel.ZoneMonitoring">
+              <MappingFragment StoreEntitySet="ZoneMonitoring">
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="BasketID" ColumnName="BasketID" />
+                <ScalarProperty Name="ZoneID" ColumnName="ZoneID" />
+                <ScalarProperty Name="EntranceTimestamp" ColumnName="EntranceTimestamp" />
+                <ScalarProperty Name="ExitTimestamp" ColumnName="ExitTimestamp" />
+                <ScalarProperty Name="Duration" ColumnName="Duration" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Configurations">
+            <EntityTypeMapping TypeName="FacesModel.Configuration">
+              <MappingFragment StoreEntitySet="Configuration">
+                <ScalarProperty Name="Key" ColumnName="Key" />
+                <ScalarProperty Name="Value" ColumnName="Value" />
+                <ScalarProperty Name="LastUpdate" ColumnName="LastUpdate" />
+                <ScalarProperty Name="UpdatedBy" ColumnName="UpdatedBy" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="true" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>
