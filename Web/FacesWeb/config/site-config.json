@@ -1,0 +1,50 @@
+﻿{
+  "Portal": {
+    "Title": "Portal",
+    "Left-Navbar": {
+      "Active":  "true",
+      "Type": "menu",
+      "Items": [
+        {
+          "Type": "divider"
+        },
+        {
+          "Type": "subheader",
+          "Label": "Navigate"
+        },
+        {
+          "Type": "list-item",
+          "Icon": "tv",
+          "Label": "Overview",
+          "Action": "navigate",
+          "State": "home.overview"
+        },
+        {
+          "Type": "divider"
+        },
+        {
+          "Type": "subheader",
+          "Label": "Tools"
+        },
+        {
+          "Type": "list-item",
+          "Icon": "settings",
+          "Label": "Settings",
+          "Action": "modal",
+          "Modal": {
+            "templateUrl": "controllers/templates/SettingsForm.html",
+            "controller": "SettingsController as vm",
+            "size": "sm"
+          }
+        },
+        {
+          "Type": "list-item",
+          "Icon": "exit_to_app",
+          "Label": "Logout",
+          "Action": "logout"          
+        }
+      ]
+    }
+  }
+
+}
