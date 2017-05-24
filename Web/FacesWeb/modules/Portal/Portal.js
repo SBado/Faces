@@ -56,7 +56,7 @@
         });
 
         $transitions.onSuccess({}, function (trans) {
-            $rootScope.$state = $state;
+            $rootScope.title = $state.current.data.title;
             $rootScope.loadingView = false;            
         });
 

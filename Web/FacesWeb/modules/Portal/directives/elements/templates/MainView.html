@@ -4,7 +4,7 @@
             <md-tooltip md-autohide="true">Menu</md-tooltip>
             <md-icon class="md-default-theme material-icons">menu</md-icon>
         </md-button>
-        <span>{{$state.current.data.title}}</span>
+        <span>{{title}}</span>
         <span flex=""></span>
     </div>
 </md-toolbar>
@@ -85,7 +85,7 @@
                 &emsp;
                 <store-breadcrumbs style="margin-top:5px;"></store-breadcrumbs>
             </div>
-            <md-content ui-view="pages" style="height: calc(100vh - 148px); margin-top:20px;"></md-content>
+            <md-content ui-view="pages" style="height: calc(100vh - 148px); padding-top:5px;"></md-content>
         </div>
     </div>
 </md-content>

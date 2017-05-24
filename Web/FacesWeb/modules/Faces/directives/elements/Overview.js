@@ -25,24 +25,86 @@
         function init() {
             _watches.push($scope.$watch('selectedStore', reload, true));
             $scope.$on("$destroy", clean);
-           
-            vm.sexLabels = ["Males", "Females"];
-            vm.glassesLabels = ["Glasses", "No Glasses"];
-            vm.beardLabels = ["Beard", "Mustaches", "Nothing"];
-            
-            vm.options = {
+
+            var options = {
+                title: {
+                    display: true,
+                    text: ''
+                },
                 legend: {
                     display: true,
                     position: 'bottom'
                 },
-                responsive: true,
-                maintainAspectRatio: true
+                responsive: false,
+                maintainAspectRatio: true,
+                tooltips: {
+                    callbacks: {
+                        label: function (tooltipItem, data) {
+                            var allData = data.datasets[tooltipItem.datasetIndex].data;
+                            var tooltipLabel = data.labels[tooltipItem.index];
+                            var tooltipData = allData[tooltipItem.index];
+                            var total = 0;
+                            for (var i in allData) {
+                                total += allData[i];
+                            }
+                            var tooltipPercentage = Math.round((tooltipData / total) * 100);
+                            return tooltipLabel + ': ' + tooltipData + ' (' + tooltipPercentage + '%)';
+                        }
+                    }
+                },
+                pieceLabel: {
+                    mode: 'percentage',
+                    precision: 2
+                }
+            }
+
+            vm.charts = {};
+            vm.charts['Sex'] = {
+                id: 'sex',
+                labels: ["Males", "Females"],
+                data: null,
+                options: angular.copy(options)
+            };
+            vm.charts['Age'] = {
+                id: 'age',
+                labels: ["0-12", "13-19", "20-60", "60+"],
+                data: null,
+                options: angular.copy(options)
+            };
+            vm.charts['Glasses'] = {
+                id: 'glasses',
+                labels: ["Glasses", "No Glasses"],
+                data: null,
+                options: angular.copy(options)
+            };
+            vm.charts['Beard'] = {
+                id: 'beard',
+                labels: ["Beard", "Mustaches", "Nothing"],
+                data: null,
+                options: angular.copy(options)
+            };            
+
+            vm.charts.Sex.options.title.text = 'Sex';
+            vm.charts.Age.options.title.text = 'Age'; 
+            vm.charts.Glasses.options.title.text = 'Glasses';
+            vm.charts.Beard.options.title.text = 'Beard';                       
+        }
+
+        function greaterThan(prop, val) {
+            return function (item) {
+                return item[prop] > val;
             }
         }
 
-        function greaterThan (prop, val) {
+        function lessThan(prop, val) {
             return function (item) {
-                return item[prop] > val;
+                return item[prop] < val;
+            }
+        }
+
+        function between(prop, minVal, maxVal) {
+            return function (item) {
+                return minVal <= item[prop] <= maxVal;
             }
         }
 
@@ -50,13 +112,13 @@
             if (!$scope.selectedStore) {
                 return;
             }
-            var root = $scope.selectedStore;           
+            var root = $scope.selectedStore;
 
             var dateFilter = '';
             var dateObj = new Date();
             var year = dateObj.getFullYear();
             var month = dateObj.getMonth() + 1; //months from 1-12
-            var day = dateObj.getDate();            
+            var day = dateObj.getDate();
             dateFilter = 'year(EntranceTimestamp) eq ' + year + ' and month(EntranceTimestamp) eq ' + month + ' and day(EntranceTimestamp) eq ' + day;
 
             var cameraFilter = '';
@@ -69,7 +131,7 @@
                 cameraFilter = cameraFilter.slice(0, -4);
                 cameraFilter = " and (" + cameraFilter + ")";
 
-                var url = "http://localhost:62696/odata/Faces?$filter=ExitTimestamp eq null and "+ dateFilter + " " + cameraFilter;
+                var url = "http://localhost:62696/odata/Faces?$filter=ExitTimestamp eq null and " + dateFilter + " " + cameraFilter;
                 $http.get(url)
                     .then(function (response) {
                         if (response.status == 200) {
@@ -82,18 +144,24 @@
                             var beard = $filter('filter')(_faces, greaterThan('Beard', 0)).length;
                             var mustaches = $filter('filter')(_faces, greaterThan('Beard', 0)).length;
                             var nothing = _faces.length > (beard + mustaches) ? _faces.length - (beard + mustaches) : 0;
+                            var children = $filter('filter')(_faces, lessThan('Age', 13)).length;
+                            var teens = $filter('filter')(_faces, between('Age', 13, 19)).length;
+                            var adults = $filter('filter')(_faces, between('Age', 20, 60)).length;
+                            var elders = $filter('filter')(_faces, greaterThan('Age', 60)).length;
 
-                            vm.sexData = [males, females];
-                            vm.glassesData = [glasses, noGlasses];
-                            vm.beardData = [beard, mustaches, nothing]
+                            vm.charts.Sex.data = [males, females];
+                            vm.charts.Glasses.data = [glasses, noGlasses];
+                            vm.charts.Beard.data = [beard, mustaches, nothing];
+                            vm.charts.Age.data = [children, teens, adults, elders];
                         }
                     }, function (error) {
                     });
             }
-            else {                
-                vm.sexData = [0, 0];
-                vm.glassesData = [0, 0];
-                vm.beardData = [0, 0, 0];
+            else {
+                vm.charts.Sex.data = [0, 0];
+                vm.charts.Glasses.data = [0, 0];
+                vm.charts.Beard.data = [0, 0, 0];
+                vm.charts.Age.data = [0, 0, 0, 0];
             }
 
         }

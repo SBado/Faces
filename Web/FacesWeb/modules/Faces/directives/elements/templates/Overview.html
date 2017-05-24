@@ -1,4 +1,4 @@
-﻿<div class="container-fluid">
+﻿<!--<div class="container-fluid">
     <div class="row">
         <div class="col-sm-3">
             <canvas id="pie-sex" class="chart chart-pie chart-xs overview-chart-pie" chart-data="vm.sexData" chart-labels="vm.sexLabels" chart-options="vm.options"></canvas>
@@ -9,5 +9,12 @@
         <div class="col-sm-3">
             <canvas id="pie-beard" class="chart chart-pie chart-xs overview-chart-pie" chart-data="vm.beardData" chart-labels="vm.beardLabels" chart-options="vm.options"></canvas>
         </div>
+    </div>
+</div>-->
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-4" ng-repeat="chart in vm.charts">
+            <canvas id="chrat.id" class="chart chart-pie chart-xs overview-chart-pie" chart-data="chart.data" chart-labels="chart.labels" chart-options="chart.options"></canvas>
+        </div>        
     </div>
 </div>
