@@ -1,0 +1,91 @@
+﻿<md-toolbar class="md-whiteframe-8dp">
+    <div class="md-toolbar-tools">
+        <md-button class="md-icon-button" ng-click="vm.closeTreePanel(); vm.openMenuPanel()">
+            <md-tooltip md-autohide="true">Menu</md-tooltip>
+            <md-icon class="md-default-theme material-icons">menu</md-icon>
+        </md-button>
+        <span>{{$state.current.data.title}}</span>
+        <span flex=""></span>
+    </div>
+</md-toolbar>
+<md-sidenav class="md-sidenav-left" md-component-id="menu">
+    <md-toolbar layout="row">
+        <div class="md-toolbar-tools">
+            <i class="material-icons" style="margin-right:10px;">face</i>
+            <h2>
+                Faces
+            </h2>
+            <span flex></span>
+            <md-button class="md-icon-button" aria-label="Close Side Panel" ng-click="vm.closeMenuPanel()">
+                <md-tooltip md-autohide="true">Close Menu</md-tooltip>
+                <i class="material-icons">close</i>
+            </md-button>
+        </div>
+    </md-toolbar>
+    <md-content layout-padding="">
+        <md-list>
+            <md-divider></md-divider>
+            <md-subheader class="md-no-sticky">Navigate</md-subheader>
+            <md-list-item>
+                <i class="material-icons" style="margin-right:10px;">tv</i>
+                <p ng-click="::vm.goTo('home.overview')">Overview</p>
+            </md-list-item>
+            <md-divider></md-divider>
+            <md-subheader class="md-no-sticky">Tools</md-subheader>
+            <md-list-item>
+                <i class="material-icons" style="margin-right:10px;">settings</i>
+                <p ng-click="::vm.showSettings()">Settings</p>
+            </md-list-item>
+            <md-list-item>
+                <i class="material-icons" style="margin-right:10px;">exit_to_app</i>
+                <p ng-click="::vm.logOut()">Logout</p>
+            </md-list-item>
+        </md-list>
+    </md-content>
+</md-sidenav>
+
+
+
+
+<md-content ng-show="userAuthenticated()">
+    <div class="overlay flexbox-row" ng-show="loadingView">
+        <md-progress-circular md-mode="indeterminate"></md-progress-circular>
+    </div>
+    <div style="display:flex;">
+        <md-sidenav class="md-sidenav-left md-whiteframe-8dp" md-component-id="tree" md-disable-backdrop md-is-locked-open="vm.isTreeOpen">
+            <md-toolbar layout="row" style="background-color:#d8d8d8 !important; color:black !important;">
+                <div class="md-toolbar-tools">
+                    <i class="material-icons" style="margin-right:10px;">store</i>
+                    <h2>
+                        Store Tree
+                    </h2>
+                    <span flex></span>
+                    <md-button class="md-icon-button" aria-label="Close Side Panel" ng-click="vm.closeTreePanel()">
+                        <md-tooltip md-autohide="true">Collapse Tree</md-tooltip>
+                        <i class="material-icons">close</i>
+                    </md-button>
+                </div>
+            </md-toolbar>
+            <md-content layout-padding="">
+                <store-tree selected-store="selectedStore"
+                            parent-stores="parentStores"
+                            child-stores="childStores"
+                            cameras="cameras"
+                            tree-api="storeTreeApi"></store-tree>
+            </md-content>
+        </md-sidenav>
+        <div style="display:flex; flex-direction:column; width:100vw;">
+            <div class="subheader">
+                <div style="width:52px; " class="squeeze-show" ng-show="!vm.isTreeOpen"">
+                    <md-button style="margin-top:5px;" class="md-icon-button" ng-click="vm.openTreePanel()">
+                        <md-tooltip md-autohide="true">Open Store Tree</md-tooltip>
+                        <i class="material-icons">store</i>
+                    </md-button>
+                </div>
+                &emsp;
+                <store-breadcrumbs style="margin-top:5px;"></store-breadcrumbs>
+            </div>
+            <md-content ui-view="pages" style="height: calc(100vh - 148px); margin-top:20px;"></md-content>
+        </div>
+    </div>
+</md-content>
