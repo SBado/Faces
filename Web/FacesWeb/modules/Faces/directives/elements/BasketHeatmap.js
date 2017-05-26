@@ -35,7 +35,7 @@
         dataPoints.push({ id: dataKeys[2], value: 95 });
 
         vm.heatmapConfig = {
-            svgUrl: 'modules/Faces/images/stores/GiglioBagnara/StoreSestriPonente.svg',
+            svgUrl: 'modules/Faces/images/stores/giglio_bagnara/store_sestri_ponente.svg',
             plugin: 'SvgAreaHeatmap',
             gradient: {
                 // enter n keys between 0 and 1 here

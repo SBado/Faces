@@ -129,9 +129,36 @@
             return $filter('filter')(stores, { FatherID: parent.ID });
         }
 
-        function getCameras(store) {
+        //function getLeafNodes(tree) {
+        //    var context = null;
+        //    if (!this) {
+        //        context = {
+        //            locations: [],
+        //            node: tree[0],
+        //            currentNode: tree[0],
+        //        };
+        //    }
+        //    else {
+        //        context = this;
+        //    }
+
+        //    var children = $filter('filter')(context.currentNode, { children: []});
+        //    if (children.length) {
+        //        children.map(function (child) {
+        //            context.locations.push(child)
+        //        });
+        //        children.map(function (child) {
+        //            context.currentNode = child;
+        //            return getChildNodes.call(context)
+        //        });
+        //    }
+
+        //    return context.locations;
+        //}
+
+        function getCameras(cameraList, store) {
             var cameras = [];
-            _cameraList.map(function (camera) {
+            cameraList.map(function (camera) {
                 if (camera.FatherID == store.data.ID || $filter('filter')(_childStores[store.data.ID], { data: { ID: camera.FatherID }}).length > 0) {
                     cameras.push(camera);                    
                 }
@@ -198,7 +225,7 @@
                 vm.parentStores = _parentStores[branch.data.ID];
 
                 if (!_cameras[branch.data.ID]) {
-                    _cameras[branch.data.ID] = getCameras(branch);                    
+                    _cameras[branch.data.ID] = getCameras(_cameraList, branch);                    
                 }
                 vm.cameras = _cameras[branch.data.ID];
                                 

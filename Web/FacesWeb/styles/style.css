@@ -127,9 +127,10 @@
 .overview-chart-pie {
     /*max-width: 350px !important;
     max-height: 350px !important;*/
-    width: 350px;
-    height: 350px;
-    display: inline-block !important;
+    /*width: 350px;
+    height: 350px;*/
+    /*display: inline-block !important;*/
+    height: 100% !important;
 }
 
 .main-view {

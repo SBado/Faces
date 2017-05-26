@@ -21,6 +21,7 @@
         var _cameras = {};
         var _faces = null;
         var _cameraList = null;
+        var _emptyChartOverride = { borderWidth: 0.5, borderColor: ['rgba(0,0,0,1)'], backgroundColor: ['rgba(255, 255, 255, 1)'] };
 
         function init() {
             _watches.push($scope.$watch('selectedStore', reload, true));
@@ -35,7 +36,7 @@
                     display: true,
                     position: 'bottom'
                 },
-                responsive: false,
+                responsive: true,
                 maintainAspectRatio: true,
                 tooltips: {
                     callbacks: {
@@ -61,33 +62,33 @@
             vm.charts = {};
             vm.charts['Sex'] = {
                 id: 'sex',
-                labels: ["Males", "Females"],
-                data: null,
-                options: angular.copy(options)
+                labels: ['Males', 'Females'],
             };
             vm.charts['Age'] = {
                 id: 'age',
-                labels: ["0-12", "13-19", "20-60", "60+"],
-                data: null,
-                options: angular.copy(options)
+                labels: ['0-12', '13-19', '20-60', '60+'], 
             };
             vm.charts['Glasses'] = {
                 id: 'glasses',
-                labels: ["Glasses", "No Glasses"],
-                data: null,
-                options: angular.copy(options)
+                labels: ['Glasses', 'No Glasses'],                
             };
             vm.charts['Beard'] = {
                 id: 'beard',
-                labels: ["Beard", "Mustaches", "Nothing"],
-                data: null,
-                options: angular.copy(options)
+                labels: ['Beard', 'Mustaches', 'Nothing'],                
             };            
 
+            angular.forEach(vm.charts, function (chart) {
+                chart.emptyLabel = ['No data'];
+                chart.dataLabels = chart.labels;
+                chart.data = null;    
+                chart.options = angular.copy(options);
+                chart.chartsOverride = null;
+            });
+
             vm.charts.Sex.options.title.text = 'Sex';
-            vm.charts.Age.options.title.text = 'Age'; 
+            vm.charts.Age.options.title.text = 'Age';
             vm.charts.Glasses.options.title.text = 'Glasses';
-            vm.charts.Beard.options.title.text = 'Beard';                       
+            vm.charts.Beard.options.title.text = 'Beard';
         }
 
         function greaterThan(prop, val) {
@@ -105,6 +106,30 @@
         function between(prop, minVal, maxVal) {
             return function (item) {
                 return minVal <= item[prop] <= maxVal;
+            }
+        }
+
+        function setChartEmpty(chart) {
+            if (!chart.dataLabels) {
+                chart.dataLabels = chart.labels;
+            }
+            chart.labels = chart.emptyLabel;
+            chart.data = [1];
+            chart.chartsOverride = _emptyChartOverride;
+        }
+
+        function setChartValues(chart, data) {
+            var sum = 0;
+            data.map(function (value) {
+                sum += value;
+            })
+            if (sum) {                
+                chart.labels = chart.dataLabels;
+                chart.data = data;
+                chart.chartsOverride = null;
+            }
+            else {
+                setChartEmpty(chart);
             }
         }
 
@@ -149,19 +174,18 @@
                             var adults = $filter('filter')(_faces, between('Age', 20, 60)).length;
                             var elders = $filter('filter')(_faces, greaterThan('Age', 60)).length;
 
-                            vm.charts.Sex.data = [males, females];
-                            vm.charts.Glasses.data = [glasses, noGlasses];
-                            vm.charts.Beard.data = [beard, mustaches, nothing];
-                            vm.charts.Age.data = [children, teens, adults, elders];
+                            setChartValues(vm.charts.Sex, [males, females]);  
+                            setChartValues(vm.charts.Glasses, [glasses, noGlasses]); 
+                            setChartValues(vm.charts.Beard, [beard, mustaches, nothing]); 
+                            setChartValues(vm.charts.Age, [children, teens, adults, elders]); 
                         }
                     }, function (error) {
                     });
             }
             else {
-                vm.charts.Sex.data = [0, 0];
-                vm.charts.Glasses.data = [0, 0];
-                vm.charts.Beard.data = [0, 0, 0];
-                vm.charts.Age.data = [0, 0, 0, 0];
+                angular.forEach(vm.charts, function (chart) {
+                    setChartEmpty(chart);
+                });
             }
 
         }
