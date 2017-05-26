@@ -11,20 +11,26 @@
         var self = this;
         var baseUrl = "http://localhost:62696/odata";
 
-        self.getStoreTrees = function (options) {
-            var url = baseUrl + '/StoreTrees';
+        function getAll(url, options) {
             if (options) {
                 url += '?' + options;
             }
-            return $http.get(url);
+            return $http.get(url);   
+        }        
+
+        self.getStoreTrees = function (options) {
+            var url = baseUrl + '/StoreTrees';
+            return getAll(url, options);
         }
 
         self.getFaces = function (options) {
             var url = baseUrl + '/Faces';
-            if (options) {
-                url += '?' + options;
-            }
-            return $http.get(url);            
+            return getAll(url, options);     
+        }
+
+        self.getBaskets = function (options) {
+            var url = baseUrl + '/Baskets';
+            return getAll(url, options);     
         }
 
         return self;

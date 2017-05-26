@@ -3,7 +3,7 @@
 (function () {
     'use strict';
 
-    angular.module('portal')
+    angular.module('faces')
         .directive('cameraList', cameraListDirective)
         .controller('CameraListController', CameraListController)
 
