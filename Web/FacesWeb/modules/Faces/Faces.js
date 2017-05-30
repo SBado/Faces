@@ -14,8 +14,8 @@
                 },
                 views: {
                     'pages': {
-                        templateUrl: "modules/Faces/directives/elements/templates/Overview.html",
-                        controller: 'OverviewController',
+                        template: "<store-overview>",
+                        controller: 'StoreOverviewController',
                         controllerAs: 'vm'                        
                     }
                 }
@@ -27,7 +27,7 @@
                 },
                 views: {
                     'pages': {
-                        templateUrl: "modules/Faces/directives/elements/templates/BasketHeatmap.html",
+                        template: '<basket-heatmap>',
                         controller: 'BasketHeatmapController',
                         controllerAs: 'vm'
                     }

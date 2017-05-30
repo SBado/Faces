@@ -9,8 +9,9 @@
         return {
             restrict: 'E',
             templateUrl: 'modules/Portal/directives/elements/templates/MainView.html',
+            controller: 'MainViewController',
             scope: true,
-            controllerAs: 'vm'
+            controllerAs: 'vm'            
         };
     }
 

@@ -21,9 +21,12 @@
     <script src="//rawgit.com/bitwiseshiftleft/sjcl/master/sjcl.js"></script>
     <script src="//rawgit.com/grevory/angular-local-storage/master/dist/angular-local-storage.min.js"></script>    
     <!--<script src="//rawgit.com/emn178/Chart.PieceLabel.js/master/build/Chart.PieceLabel.min.js"></script>-->   
-    <script src="//rawgit.com/pa7/heatmap.js/master/build/heatmap.min.js"></script>
-    <script src="//rawgit.com/pa7/heatmap.js/master/plugins/svg-area-heatmap.js"></script>    
-    <script src="//rawgit.com/pa7/heatmap.js/master/plugins/angular-heatmap/angular-heatmap.js"></script>
+    <!--<script src="//rawgit.com/pa7/heatmap.js/master/build/heatmap.min.js"></script>-->
+    <script src="scripts/heatmap.js"></script>
+    <!--<script src="//rawgit.com/pa7/heatmap.js/master/plugins/svg-area-heatmap.js"></script>-->
+    <script src="scripts/svg-area-heatmap.js"></script>
+    <!--<script src="//rawgit.com/pa7/heatmap.js/master/plugins/angular-heatmap/angular-heatmap.js"></script>-->
+    <script src="scripts/angular-heatmap.js"></script>
     <script src="scripts/Chart.PieceLabel.js"></script>
     <script src="scripts/ui-bootstrap-custom-tpls-1.3.2.js"></script>
     <script src="scripts/datepicker.decorator.js"></script>
@@ -38,13 +41,14 @@
     <script src="modules/Portal/services/TokenService.js"></script>
     <script src="modules/Portal/services/UserService.js"></script>
     <script src="modules/Faces/services/WebApiService.js"></script>
+    <script src="modules/Faces/services/StoreTreeService.js"></script>
     <script src="modules/Portal/controllers/ParentController.js"></script>
     <script src="modules/Portal/controllers/LoginForm.js"></script>
     <script src="modules/Portal/controllers/SettingsForm.js"></script>
     <script src="modules/Portal/directives/elements/MainView.js"></script>
     <script src="modules/Faces/directives/elements/StoreTree.js"></script>
     <script src="modules/Faces/directives/elements/StoreBreadcrumbs.js"></script>
-    <script src="modules/Faces/directives/elements/Overview.js"></script>
+    <script src="modules/Faces/directives/elements/StoreOverview.js"></script>
     <script src="modules/Faces/directives/elements/BasketHeatmap.js"></script>
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
     <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">

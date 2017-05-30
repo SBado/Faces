@@ -11,32 +11,34 @@
             templateUrl: 'modules/Faces/directives/elements/templates/StoreBreadcrumbs.html',
             controller: StoreBreadcrumbsController,
             controllerAs: 'vm',
-            scope: true            
+            scope: {}            
         };
     }
 
-    function StoreBreadcrumbsController($scope) {
+    function StoreBreadcrumbsController($scope, StoreTreeService) {
 
         var vm = this;
         var _watches = [];
 
         var selectStore = function (index) {
             vm.breadCrumbs.splice(index + 1);
-            $scope.storeTreeApi.selectStore(vm.breadCrumbs[index].store)
+            StoreTreeService.storeTreeApi.selectStore(vm.breadCrumbs[index].store);
         }
 
         function init() {
-            _watches.push($scope.$watch('selectedStore', reload, true));
-            $scope.$on("$destroy", clean);            
+            _watches.push($scope.$watch(function () {
+                return StoreTreeService.context.selectedStore;
+            }, reload, true));
+            $scope.$on("$destroy", clean);          
         }
 
         function reload() {
             vm.breadCrumbs = [];
 
-            if ($scope.selectedStore) {                
+            if (StoreTreeService.context.selectedStore) {                
 
-                if ($scope.parentStores) {
-                    $scope.parentStores.map(function (store) {
+                if (StoreTreeService.context.parentStores) {
+                    StoreTreeService.context.parentStores.map(function (store) {
                         vm.breadCrumbs.push({
                             store: store,
                             label: store.label
@@ -45,8 +47,8 @@
                 }
 
                 vm.breadCrumbs.push({
-                    store: $scope.selectedStore,
-                    label: $scope.selectedStore.label
+                    store: StoreTreeService.context.selectedStore,
+                    label: StoreTreeService.context.selectedStore.label
                 });
             }
         }
@@ -63,6 +65,6 @@
         
     }
 
-    StoreBreadcrumbsController.$inject = ['$scope'];
+    StoreBreadcrumbsController.$inject = ['$scope', 'StoreTreeService'];
 
 })();
