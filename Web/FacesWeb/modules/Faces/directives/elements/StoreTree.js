@@ -22,7 +22,7 @@
                 treeApi: '='
             },
             link: function (scope, element, attrs, controller) {
-                
+
             }
         };
     }
@@ -33,7 +33,9 @@
         var _treeData = [];
         var _noLeafTreeData = [];
         var _initialSelection = null;
-        var _storeList = null;        
+        var _storeList = null;
+        var _companies = {};
+        var _buildings = {};
         var _childStores = {};
         var _parentStores = {};
         var _cameras = {};
@@ -56,53 +58,68 @@
             }
         }
 
-        function searchNode(tree, node) {
+        function searchBranch(tree, branch) {
             for (var n in tree) {
                 if (!tree.hasOwnProperty(n))
                     continue;
 
-                if (tree[n].data.ID == node.ID) {
+                if (tree[n].data.ID == branch.ID) {
                     return tree[n];
                 }
                 else if (tree[n].children && tree[n].children.length > 0) {
-                    return searchNode(tree[n].children, node);
+                    return searchBranch(tree[n].children, branch);
                 }
             }
         }
 
-        function getParentNodes(treeController, node) {
+        function getParentBranches(treeController, branch) {
             var parents = [];
-            var n = node;
-            while (n.parent_uid) {
-                var parent = treeController.get_parent_branch(n);
+            var b = branch;
+            while (b.parent_uid) {
+                var parent = treeController.get_parent_branch(b);
                 parents.unshift(parent);
-                n = parent;
+                b = parent;
             }
 
             return parents;
         }
 
-        function getChildNodes(node) {
+        function getParentBuilding(treeController, branch) {
+            var b = branch;
+            while (b.parent_uid) {
+                var parent = treeController.get_parent_branch(b);
+                if (parent.parent_uid) {
+                    b = parent;
+                }
+                else {
+                    return b;
+                }
+            }
+
+            return null;
+        }
+
+        function getChildBranches(branch) {
             var context = null;
             if (!this) {
                 context = {
                     locations: [],
-                    node: node,
-                    currentNode: node
+                    branch: branch,
+                    currentBranch: branch
                 };
             }
             else {
                 context = this;
             }
 
-            var children = $filter('filter')(context.currentNode.children, { data: { FatherID: context.currentNode.data.ID } });
+            var children = $filter('filter')(context.currentBranch.children, { data: { FatherID: context.currentBranch.data.ID } });
             if (children.length) {
                 children.map(function (child) {
                     context.locations.push(child)
                 });
                 children.map(function (child) {
-                    context.currentNode = child;
-                    return getChildNodes.call(context)
+                    context.currentBranch = child;
+                    return getChildBranches.call(context)
                 });
             }
 
@@ -113,23 +130,23 @@
             return $filter('filter')(stores, { FatherID: parent.ID });
         }
 
-        function removeLeafNodes(node) {
-            for (var i = 0; i < node.children.length; i++) {
-                if (node.children[i].children.length == 0) {
-                    node.children.splice(i, 1);
+        function removeLeafBranches(branch) {
+            for (var i = 0; i < branch.children.length; i++) {
+                if (branch.children[i].children.length == 0) {
+                    branch.children.splice(i, 1);
                     i--;
                 }
                 else {
-                    removeLeafNodes(node.children[i]);
+                    removeLeafBranches(branch.children[i]);
                 }
             }
         }
 
-        function getCompanies(tree) {
-            return $filter('filter')(tree, { data: { FatherID: null } });
+        function getCompanies(stores) {
+            return $filter('filter')(stores, { data: { FatherID: null } });
         }
 
-        function getPhysicalStores(tree, companyList) {
+        function getBuildings(tree, companyList) {
             return $filter('filter')(tree, thisInThatPredicate('data.FatherID', companyList, 'data.ID'));
         }
 
@@ -158,9 +175,9 @@
             rootLocations.map(function (rootLocation) {
                 var children = getChildStores(_storeList, rootLocation);
                 if (fatherId) {
-                    var rootLocationNode = searchNode(vm.treeData, rootLocation);
-                    if (rootLocationNode) {
-                        rootLocationNode.children = children.map(function (child) {
+                    var rootLocationBranch = searchBranch(vm.treeData, rootLocation);
+                    if (rootLocationBranch) {
+                        rootLocationBranch.children = children.map(function (child) {
                             return {
                                 label: child.Name,
                                 data: child
@@ -169,7 +186,7 @@
                     }
                 }
                 else {
-                    var node = {
+                    var branch = {
                         label: rootLocation.Name,
                         children: children.map(function (child) {
                             return {
@@ -180,9 +197,9 @@
                         data: rootLocation,
                         selected: _treeData.length == 0
                     };
-                    _treeData.push(node);
-                    if (node.selected) {
-                        _initialSelection = node;
+                    _treeData.push(branch);
+                    if (branch.selected) {
+                        _initialSelection = branch;
                     }
                 }
 
@@ -198,38 +215,45 @@
         }
 
         function onSelectedStore(branch) {
-            if (!vm.context.selectedStore || branch.data.ID != vm.context.selectedStore.data.ID) {
-                vm.context.selectedStore = branch;
-                //vm.selectedStore = branch;
+            if (!vm.context.store || branch.data.ID != vm.context.store.data.ID) {
+                vm.context.store = branch;
+                var storeId = branch.data.ID;
 
-                if (!_childStores[branch.data.ID]) {
-                    _childStores[branch.data.ID] = getChildNodes(branch);
+                if (!_childStores[storeId]) {
+                    _childStores[storeId] = getChildBranches(branch);
                 }
-                vm.context.childStores = _childStores[branch.data.ID];
+                vm.context.childStores = _childStores[storeId];
 
-                if (!_parentStores[branch.data.ID]) {
-                    _parentStores[branch.data.ID] = getParentNodes(vm.tree, branch);
+                if (!_parentStores[storeId]) {
+                    _parentStores[storeId] = getParentBranches(vm.tree, branch);
                 }
-                vm.context.parentStores = _parentStores[branch.data.ID];
+                vm.context.parentStores = _parentStores[storeId];
 
-                if (!_cameras[branch.data.ID]) {
-                    _cameras[branch.data.ID] = getStoreCameras(_cameraList, branch);
+                if (!_companies[storeId]) {
+                    var companies = $filter('filter')(_parentStores[storeId], { data: { FatherID: null } });
+                    if (companies.length) {
+                        _companies[storeId] = companies[0];
+                    }
+                    else {
+                        _companies[storeId] = branch;
+                    }
                 }
-                vm.context.cameras = _cameras[branch.data.ID];
+                vm.context.company = _companies[storeId];
 
-                if (!_zones[branch.data.ID]) {
-                    _zones[branch.data.ID] = getStoreZones(_zoneList, branch);
+                if (!_buildings[storeId]) {
+                    _buildings[storeId] = getParentBuilding(vm.tree, branch);
                 }
-                vm.context.zones = _zones[branch.data.ID];
+                vm.context.building = _buildings[storeId];
 
-                //var arr2 = [];
-                //var node2 = branch;
-                //var a = vm.tree.get_next_branch(node2);
-                //while (a) {
-                //    arr2.push(a);
-                //    node2 = a;
-                //    a = vm.tree.get_next_branch(node2)
-                //}                
+                if (!_cameras[storeId]) {
+                    _cameras[storeId] = getStoreCameras(_cameraList, branch);
+                }
+                vm.context.cameras = _cameras[storeId];
+
+                if (!_zones[storeId]) {
+                    _zones[storeId] = getStoreZones(_zoneList, branch);
+                }
+                vm.context.zones = _zones[storeId];
             }
         }
 
@@ -248,32 +272,37 @@
         function init() {
             vm.tree = {};
             vm.treeData = _treeData;
-            vm.context = {};
-            vm.context.companies = null;
-            vm.context.physicalStores = null;
-            vm.context.selectedStore = null;
+            vm.context = {
+                tree: {}
+            };
+            vm.context.tree.companies = null;
+            vm.context.tree.buildings = null;
+            vm.context.company = null;
+            vm.context.building = null;
+            vm.context.store = null;
             vm.context.parentStores = null;
             vm.context.childStores = null;
+            vm.context.zones = null;
             vm.context.cameras = null;
 
             vm.onSelectedStore = onSelectedStore;
             vm.selectStore = selectStore;
             vm.showZones = showZones;
-            vm.hideZones = hideZones;                        
+            vm.hideZones = hideZones;
 
             WebApiService.getStoreTrees()
                 .then(function (response) {
                     if (response.status == 200) {
-                        _storeList = $filter('filter')(response.data.value, { IsCamera: false });                        
+                        _storeList = $filter('filter')(response.data.value, { IsCamera: false });
                         _cameraList = $filter('filter')(response.data.value, { IsCamera: true });
                         _zoneList = $filter('filter')(response.data.value, { IsZone: true });
                         addStores(null);
 
-                        vm.context.companies = getCompanies(vm.treeData);
-                        vm.context.physicalStores = getPhysicalStores(vm.treeData, vm.context.companies);
-                        
+                        vm.context.tree.companies = getCompanies(vm.treeData);
+                        vm.context.tree.buildings = getBuildings(vm.treeData, vm.context.tree.companies);
+
                         _noLeafTreeData = angular.copy(vm.treeData);
-                        angular.forEach(_noLeafTreeData, removeLeafNodes);
+                        angular.forEach(_noLeafTreeData, removeLeafBranches);
 
                         StoreTreeService.context = vm.context;
                         StoreTreeService.storeTreeApi = {

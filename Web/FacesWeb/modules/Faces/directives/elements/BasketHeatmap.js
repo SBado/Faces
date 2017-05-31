@@ -39,7 +39,7 @@
             }
 
             _watches.push($scope.$watch(function () {
-                return StoreTreeService.context.selectedStore;
+                return StoreTreeService.context.store;
             }, reload, true));
             $scope.$on("$destroy", clean);
 
@@ -58,7 +58,7 @@
 
         function reload() {
 
-            if (!StoreTreeService.context.selectedStore) {
+            if (!StoreTreeService.context.store) {
                 return;
             }            
 

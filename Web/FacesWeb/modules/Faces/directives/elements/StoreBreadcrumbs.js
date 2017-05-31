@@ -27,7 +27,7 @@
 
         function init() {
             _watches.push($scope.$watch(function () {
-                return StoreTreeService.context.selectedStore;
+                return StoreTreeService.context.store;
             }, reload, true));
             $scope.$on("$destroy", clean);          
         }
@@ -35,7 +35,7 @@
         function reload() {
             vm.breadCrumbs = [];
 
-            if (StoreTreeService.context.selectedStore) {                
+            if (StoreTreeService.context.store) {                
 
                 if (StoreTreeService.context.parentStores) {
                     StoreTreeService.context.parentStores.map(function (store) {
@@ -47,8 +47,8 @@
                 }
 
                 vm.breadCrumbs.push({
-                    store: StoreTreeService.context.selectedStore,
-                    label: StoreTreeService.context.selectedStore.label
+                    store: StoreTreeService.context.store,
+                    label: StoreTreeService.context.store.label
                 });
             }
         }
