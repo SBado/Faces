@@ -27,9 +27,10 @@
         };
     }
 
-    function StoreTreeController($rootScope, $filter, StoreTreeService, WebApiService) {
+    function StoreTreeController($rootScope, $scope, $filter, StoreTreeService, WebApiService) {
 
         var vm = this;
+        var _deregisterWatch = null;
         var _treeData = [];
         var _noLeafTreeData = [];
         var _initialSelection = null;
@@ -130,24 +131,30 @@
             return $filter('filter')(stores, { FatherID: parent.ID });
         }
 
-        function removeLeafBranches(branch) {
-            for (var i = 0; i < branch.children.length; i++) {
-                if (branch.children[i].children.length == 0) {
-                    branch.children.splice(i, 1);
-                    i--;
-                }
-                else {
-                    removeLeafBranches(branch.children[i]);
-                }
-            }
-        }
+        //function removeLeafBranches(branch) {
+        //    for (var i = 0; i < branch.children.length; i++) {
+        //        if (branch.children[i].children.length == 0) {
+        //            branch.children.splice(i, 1);
+        //            i--;
+        //        }
+        //        else {
+        //            removeLeafBranches(branch.children[i]);
+        //        }
+        //    }
+        //}
 
         function getCompanies(stores) {
             return $filter('filter')(stores, { data: { FatherID: null } });
         }
 
-        function getBuildings(tree, companyList) {
-            return $filter('filter')(tree, thisInThatPredicate('data.FatherID', companyList, 'data.ID'));
+        function getBuildings(treeData, treeController) {
+            //return $filter('filter')(tree, thisInThatPredicate('data.FatherID', companyList, 'data.ID'));
+            var buildings = [];
+            treeData.map(function (branch) {
+                buildings = buildings.concat(treeController.get_children(branch));
+            });
+
+            return buildings;
         }
 
         function getStoreCameras(cameraList, store) {
@@ -175,7 +182,7 @@
             rootLocations.map(function (rootLocation) {
                 var children = getChildStores(_storeList, rootLocation);
                 if (fatherId) {
-                    var rootLocationBranch = searchBranch(vm.treeData, rootLocation);
+                    var rootLocationBranch = searchBranch(_treeData, rootLocation);
                     if (rootLocationBranch) {
                         rootLocationBranch.children = children.map(function (child) {
                             return {
@@ -197,6 +204,7 @@
                         data: rootLocation,
                         selected: _treeData.length == 0
                     };
+                    //vm.tree.add_root_branch(branch);
                     _treeData.push(branch);
                     if (branch.selected) {
                         _initialSelection = branch;
@@ -212,6 +220,39 @@
 
             });
             //}
+        }
+
+        function addBranch(parent, child) {                 
+            if (child) {
+                var branch = {
+                    label: child.Name,
+                    children: [],
+                    data: child
+                };
+                vm.tree.add_branch(parent, branch);
+
+                var children = getChildStores(_storeList, child);
+                children.map(function (child) {
+                    addBranch(branch, child);
+                });
+            }
+            else {
+                var rootBranch = {
+                    label: parent.Name,
+                    children: [],
+                    data: parent,
+                    //selected: vm.treeData.length == 0
+                };
+                vm.tree.add_root_branch(rootBranch);
+                //if (rootBranch.selected) {
+                //    _initialSelection = rootBranch;
+                //}
+
+                var children = getChildStores(_storeList, parent);
+                children.map(function (child) {
+                    addBranch(rootBranch, child);
+                });
+            }            
         }
 
         function onSelectedStore(branch) {
@@ -261,17 +302,17 @@
             vm.tree.select_branch(branch);
         }
 
-        function hideZones() {
-            vm.treeData = _noLeafTreeData;
-        }
+        //function hideZones() {
+        //    vm.treeData = _noLeafTreeData;
+        //}
 
-        function showZones() {
-            vm.treeData = _treeData;
-        }
+        //function showZones() {
+        //    vm.treeData = _treeData;
+        //}
 
         function init() {
             vm.tree = {};
-            vm.treeData = _treeData;
+            vm.treeData = [];
             vm.context = {
                 tree: {}
             };
@@ -287,8 +328,35 @@
 
             vm.onSelectedStore = onSelectedStore;
             vm.selectStore = selectStore;
-            vm.showZones = showZones;
-            vm.hideZones = hideZones;
+            //vm.showZones = showZones;
+            //vm.hideZones = hideZones;           
+
+            _deregisterWatch = $scope.$watch('vm.treeData', function (newValue, oldValue) {
+                if (newValue == oldValue || (newValue.length && !newValue[0].uid)) {
+                    return;
+                }                
+
+                _deregisterWatch();
+                //_treeData.length = 0;
+                //_noLeafTreeData.length = 0;
+                //_treeData = angular.copy(vm.treeData);
+                //_noLeafTreeData = angular.copy(vm.treeData);
+                //angular.forEach(_noLeafTreeData, removeLeafBranches);
+
+                vm.context.tree.companies = getCompanies(vm.treeData);
+                vm.context.tree.buildings = getBuildings(vm.treeData, vm.tree);
+
+                StoreTreeService.context = vm.context;
+                StoreTreeService.storeTreeApi = {
+                    selectStore: vm.selectStore,
+                    //hideZones: vm.hideZones,
+                    //showZones: vm.showZones
+                };
+
+                StoreTreeService.treeLoaded = true;
+                $rootScope.$broadcast('tree-loaded');
+                
+            }, true)
 
             WebApiService.getStoreTrees()
                 .then(function (response) {
@@ -296,24 +364,18 @@
                         _storeList = $filter('filter')(response.data.value, { IsCamera: false });
                         _cameraList = $filter('filter')(response.data.value, { IsCamera: true });
                         _zoneList = $filter('filter')(response.data.value, { IsZone: true });
-                        addStores(null);
 
-                        vm.context.tree.companies = getCompanies(vm.treeData);
-                        vm.context.tree.buildings = getBuildings(vm.treeData, vm.context.tree.companies);
+                        $filter('filter')(response.data.value, { FatherID: null }).map(function (root) {
+                            addBranch(root);
+                        });
+                        //addStores(null);
+                        //vm.treeData = _treeData;
+                        //_treeData = angular.copy(vm.treeData);
+                        //_noLeafTreeData = angular.copy(vm.treeData);
+                        //angular.forEach(_noLeafTreeData, removeLeafBranches);                                                
 
-                        _noLeafTreeData = angular.copy(vm.treeData);
-                        angular.forEach(_noLeafTreeData, removeLeafBranches);
-
-                        StoreTreeService.context = vm.context;
-                        StoreTreeService.storeTreeApi = {
-                            selectStore: vm.selectStore,
-                            hideZones: vm.hideZones,
-                            showZones: vm.showZones
-                        };
-
-                        onSelectedStore(vm.treeData[0]);
-
-                        $rootScope.$broadcast('tree-loaded');
+                        vm.tree.select_branch(vm.treeData[0]);
+                        //onSelectedStore(vm.treeData[0]);                  
                     }
                 }, function (error) {
                 });
@@ -323,6 +385,6 @@
 
     }
 
-    StoreTreeController.$inject = ['$rootScope', '$filter', 'StoreTreeService', 'WebApiService'];
+    StoreTreeController.$inject = ['$rootScope', '$scope', '$filter', 'StoreTreeService', 'WebApiService'];
 
 })();

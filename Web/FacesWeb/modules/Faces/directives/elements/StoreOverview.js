@@ -17,6 +17,7 @@
 
     function StoreOverviewController($scope, $filter, $http, StoreTreeService, WebApiService) {
         var vm = this;
+        var _treeLoadedEvent = null;
         var _watches = [];
         var _locations = {};
         var _cameras = {};
@@ -182,7 +183,7 @@
             }
         }
 
-        init();
+        init();        
     }
 
     StoreOverviewController.$inject = ['$scope', '$filter', '$http', 'StoreTreeService', 'WebApiService'];

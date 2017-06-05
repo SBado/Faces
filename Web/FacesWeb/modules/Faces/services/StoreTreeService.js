@@ -11,7 +11,7 @@
         var self = this;
 
         self.context = {};                
-        self.storeTreeApi = null;              
+        self.storeTreeApi = null;
 
         return self;
     }

@@ -18,6 +18,7 @@
     function StoreBreadcrumbsController($scope, StoreTreeService) {
 
         var vm = this;
+        var _treeLoadedEvent = null;
         var _watches = [];
 
         var selectStore = function (index) {
@@ -61,7 +62,7 @@
 
         vm.selectStore = selectStore;
 
-        init();
+        init();   
         
     }
 

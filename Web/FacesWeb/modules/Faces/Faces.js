@@ -14,9 +14,7 @@
                 },
                 views: {
                     'pages': {
-                        template: "<store-overview>",
-                        controller: 'StoreOverviewController',
-                        controllerAs: 'vm'                        
+                        template: "<store-overview>"            
                     }
                 }
             })
@@ -27,9 +25,7 @@
                 },
                 views: {
                     'pages': {
-                        template: '<basket-heatmap>',
-                        controller: 'BasketHeatmapController',
-                        controllerAs: 'vm'
+                        template: '<basket-heatmap>'
                     }
                 }
             })
