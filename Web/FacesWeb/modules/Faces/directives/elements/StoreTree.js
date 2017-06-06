@@ -1,6 +1,4 @@
-﻿//https://github.com/alarv/ng-login
-
-(function () {
+﻿(function () {
     'use strict';
 
     angular.module('portal')
@@ -47,29 +45,6 @@
         function emptyArrayPredicate(prop) {
             return function (item) {
                 return Array.isArray(item[prop]) && item[prop].length == 0;
-            }
-        }
-
-        function thisInThatPredicate(thisProp, thatArray, thatProp) {
-            return function (item) {
-                //return array.indexOf(item[prop]) != -1;
-                var expr = {};
-                expr[thatProp] = item[thisProp];
-                return $filter('filter')(thatArray, expr).length > 0;
-            }
-        }
-
-        function searchBranch(tree, branch) {
-            for (var n in tree) {
-                if (!tree.hasOwnProperty(n))
-                    continue;
-
-                if (tree[n].data.ID == branch.ID) {
-                    return tree[n];
-                }
-                else if (tree[n].children && tree[n].children.length > 0) {
-                    return searchBranch(tree[n].children, branch);
-                }
             }
         }
 
@@ -131,24 +106,11 @@
             return $filter('filter')(stores, { FatherID: parent.ID });
         }
 
-        //function removeLeafBranches(branch) {
-        //    for (var i = 0; i < branch.children.length; i++) {
-        //        if (branch.children[i].children.length == 0) {
-        //            branch.children.splice(i, 1);
-        //            i--;
-        //        }
-        //        else {
-        //            removeLeafBranches(branch.children[i]);
-        //        }
-        //    }
-        //}
-
         function getCompanies(stores) {
             return $filter('filter')(stores, { data: { FatherID: null } });
         }
 
         function getBuildings(treeData, treeController) {
-            //return $filter('filter')(tree, thisInThatPredicate('data.FatherID', companyList, 'data.ID'));
             var buildings = [];
             treeData.map(function (branch) {
                 buildings = buildings.concat(treeController.get_children(branch));
@@ -177,52 +139,22 @@
             return zones;
         }
 
-        function addStores(fatherId) {
-            var rootLocations = $filter('filter')(_storeList, { FatherID: fatherId });
-            rootLocations.map(function (rootLocation) {
-                var children = getChildStores(_storeList, rootLocation);
-                if (fatherId) {
-                    var rootLocationBranch = searchBranch(_treeData, rootLocation);
-                    if (rootLocationBranch) {
-                        rootLocationBranch.children = children.map(function (child) {
-                            return {
-                                label: child.Name,
-                                data: child
-                            };
-                        });
-                    }
-                }
-                else {
-                    var branch = {
-                        label: rootLocation.Name,
-                        children: children.map(function (child) {
-                            return {
-                                label: child.Name,
-                                data: child
-                            };
-                        }),
-                        data: rootLocation,
-                        selected: _treeData.length == 0
-                    };
-                    //vm.tree.add_root_branch(branch);
-                    _treeData.push(branch);
-                    if (branch.selected) {
-                        _initialSelection = branch;
-                    }
-                }
+        function getStoreBranch(treeData, store) {
+            for (var p in treeData) {
+                if (!tree.hasOwnProperty(p))
+                    continue;
 
-                _storeList.splice(_storeList.findIndex(x => x.ID == rootLocation.ID), 1);
-                if (_storeList.length != 0) {
-                    children.map(function (child) {
-                        addStores(child.FatherID);
-                    });
+                if (treeData[p].data.ID == store.ID) {
+                    return treeData[p];
                 }
-
-            });
-            //}
+                else if (treeData[p].children && treeData[p].children.length > 0) {
+                    return searchStore(treeData[p].children, store);
+                }
+                else return null;
+            }
         }
 
-        function addBranch(parent, child) {                 
+        function addBranch(parent, child) {
             if (child) {
                 var branch = {
                     label: child.Name,
@@ -252,7 +184,7 @@
                 children.map(function (child) {
                     addBranch(rootBranch, child);
                 });
-            }            
+            }
         }
 
         function onSelectedStore(branch) {
@@ -302,13 +234,9 @@
             vm.tree.select_branch(branch);
         }
 
-        //function hideZones() {
-        //    vm.treeData = _noLeafTreeData;
-        //}
-
-        //function showZones() {
-        //    vm.treeData = _treeData;
-        //}
+        function _selectStore(store) {
+            vm.tree.select_branch(getStoreBranch(vm.treeData, store));
+        }
 
         function init() {
             vm.tree = {};
@@ -334,7 +262,7 @@
             _deregisterWatch = $scope.$watch('vm.treeData', function (newValue, oldValue) {
                 if (newValue == oldValue || (newValue.length && !newValue[0].uid)) {
                     return;
-                }                
+                }
 
                 _deregisterWatch();
                 //_treeData.length = 0;
@@ -355,7 +283,7 @@
 
                 StoreTreeService.treeLoaded = true;
                 $rootScope.$broadcast('tree-loaded');
-                
+
             }, true)
 
             WebApiService.getStoreTrees()
@@ -388,3 +316,72 @@
     StoreTreeController.$inject = ['$rootScope', '$scope', '$filter', 'StoreTreeService', 'WebApiService'];
 
 })();
+
+
+//function thisInThatPredicate(thisProp, thatArray, thatProp) {
+//    return function (item) {
+//        //return array.indexOf(item[prop]) != -1;
+//        var expr = {};
+//        expr[thatProp] = item[thisProp];
+//        return $filter('filter')(thatArray, expr).length > 0;
+//    }
+//}
+
+//function searchBranch(tree, branch) {
+//    for (var n in tree) {
+//        if (!tree.hasOwnProperty(n))
+//            continue;
+
+//        if (tree[n].data.ID == branch.ID) {
+//            return tree[n];
+//        }
+//        else if (tree[n].children && tree[n].children.length > 0) {
+//            return searchBranch(tree[n].children, branch);
+//        }
+//    }
+//}
+
+//function addStores(fatherId) {
+//    var rootLocations = $filter('filter')(_storeList, { FatherID: fatherId });
+//    rootLocations.map(function (rootLocation) {
+//        var children = getChildStores(_storeList, rootLocation);
+//        if (fatherId) {
+//            var rootLocationBranch = searchBranch(_treeData, rootLocation);
+//            if (rootLocationBranch) {
+//                rootLocationBranch.children = children.map(function (child) {
+//                    return {
+//                        label: child.Name,
+//                        data: child
+//                    };
+//                });
+//            }
+//        }
+//        else {
+//            var branch = {
+//                label: rootLocation.Name,
+//                children: children.map(function (child) {
+//                    return {
+//                        label: child.Name,
+//                        data: child
+//                    };
+//                }),
+//                data: rootLocation,
+//                selected: _treeData.length == 0
+//            };
+//            //vm.tree.add_root_branch(branch);
+//            _treeData.push(branch);
+//            if (branch.selected) {
+//                _initialSelection = branch;
+//            }
+//        }
+
+//        _storeList.splice(_storeList.findIndex(x => x.ID == rootLocation.ID), 1);
+//        if (_storeList.length != 0) {
+//            children.map(function (child) {
+//                addStores(child.FatherID);
+//            });
+//        }
+
+//    });
+//    //}
+//}
