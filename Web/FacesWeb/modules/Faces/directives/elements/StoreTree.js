@@ -107,7 +107,9 @@
         }        
 
         function getCompanies(stores) {
-            return $filter('filter')(stores, { data: { FatherID: null } });
+            return ($filter('filter')(stores, { data: { FatherID: null } })).map(function (company) {
+                return company.data;
+            });
         }
 
         function getBuildings(treeData, treeController) {
@@ -116,7 +118,9 @@
                 buildings = buildings.concat(treeController.get_children(branch));
             });
 
-            return buildings;
+            return buildings.map(function (building) {
+                return building.data;
+            });
         }
 
         function getStoreCameras(cameraList, branch) {
@@ -255,30 +259,21 @@
             vm.context.cameras = null;
 
             vm.onSelectedStore = onSelectedStore;
-            vm.selectStore = selectStore;
-            //vm.showZones = showZones;
-            //vm.hideZones = hideZones;           
+            vm.selectStore = selectStore;                    
 
             _deregisterWatch = $scope.$watch('vm.treeData', function (newValue, oldValue) {
                 if (newValue == oldValue || (newValue.length && !newValue[0].uid)) {
                     return;
                 }
 
-                _deregisterWatch();
-                //_treeData.length = 0;
-                //_noLeafTreeData.length = 0;
-                //_treeData = angular.copy(vm.treeData);
-                //_noLeafTreeData = angular.copy(vm.treeData);
-                //angular.forEach(_noLeafTreeData, removeLeafBranches);
+                _deregisterWatch();                
 
                 vm.context.tree.companies = getCompanies(vm.treeData);
                 vm.context.tree.buildings = getBuildings(vm.treeData, vm.tree);
 
                 StoreTreeService.context = vm.context;
                 StoreTreeService.storeTreeApi = {
-                    selectStore: vm.selectStore,
-                    //hideZones: vm.hideZones,
-                    //showZones: vm.showZones
+                    selectStore: vm.selectStore                    
                 };
 
                 StoreTreeService.treeLoaded = true;

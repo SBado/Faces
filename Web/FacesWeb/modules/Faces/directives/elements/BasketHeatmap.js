@@ -50,8 +50,8 @@
             vm.heatmaps = [];
 
             if (StoreTreeService.context.building) {
-                var company = StoreTreeService.context.company.data.Name.toLowerCase().replace(/ /g, '_');
-                var building = StoreTreeService.context.building.data.Name.toLowerCase().replace(/ /g, '_');
+                var company = StoreTreeService.context.company.Name.toLowerCase().replace(/ /g, '_');
+                var building = StoreTreeService.context.building.Name.toLowerCase().replace(/ /g, '_');
                 var svgPath = [_imagesBasePath, company, building, 'store.svg'].join('/');
 
                 var heatmapData = {
@@ -80,8 +80,8 @@
             else if (StoreTreeService.context.company) {
                 var svgPaths = [];
                 StoreTreeService.context.tree.buildings.map(function (building) {
-                    var company = StoreTreeService.context.company.data.Name.toLowerCase().replace(/ /g, '_');
-                    var svgPath = [_imagesBasePath, company, building.data.Name.toLowerCase().replace(/ /g, '_'), 'store.svg'].join('/');
+                    var company = StoreTreeService.context.company.Name.toLowerCase().replace(/ /g, '_');
+                    var svgPath = [_imagesBasePath, company, building.Name.toLowerCase().replace(/ /g, '_'), 'store.svg'].join('/');
                     svgPaths.push(svgPath);
                 });
 
