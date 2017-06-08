@@ -42,14 +42,14 @@
                     StoreTreeService.context.parentStores.map(function (store) {
                         vm.breadCrumbs.push({
                             store: store,
-                            label: store.label
+                            name: store.Name
                         });
                     });
                 }
 
                 vm.breadCrumbs.push({
                     store: StoreTreeService.context.store,
-                    label: StoreTreeService.context.store.label
+                    name: StoreTreeService.context.store.Name
                 });
             }
         }

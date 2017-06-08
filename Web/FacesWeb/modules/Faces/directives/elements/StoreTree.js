@@ -48,12 +48,12 @@
             }
         }
 
-        function getParentBranches(treeController, branch) {
+        function getParentStores(treeController, branch) {
             var parents = [];
             var b = branch;
             while (b.parent_uid) {
                 var parent = treeController.get_parent_branch(b);
-                parents.unshift(parent);
+                parents.unshift(parent.data);
                 b = parent;
             }
 
@@ -68,14 +68,18 @@
                     b = parent;
                 }
                 else {
-                    return b;
+                    return b.data;
                 }
             }
 
             return null;
         }
 
-        function getChildBranches(branch) {
+        function getChildren(stores, parent) {
+            return $filter('filter')(stores, { FatherID: parent.ID });
+        }
+
+        function getChildStores(branch) {
             var context = null;
             if (!this) {
                 context = {
@@ -91,20 +95,16 @@
             var children = $filter('filter')(context.currentBranch.children, { data: { FatherID: context.currentBranch.data.ID } });
             if (children.length) {
                 children.map(function (child) {
-                    context.locations.push(child)
+                    context.locations.push(child.data)
                 });
                 children.map(function (child) {
                     context.currentBranch = child;
-                    return getChildBranches.call(context)
+                    return getChildStores.call(context)
                 });
             }
 
             return context.locations;
-        }
-
-        function getChildStores(stores, parent) {
-            return $filter('filter')(stores, { FatherID: parent.ID });
-        }
+        }        
 
         function getCompanies(stores) {
             return $filter('filter')(stores, { data: { FatherID: null } });
@@ -119,20 +119,20 @@
             return buildings;
         }
 
-        function getStoreCameras(cameraList, store) {
+        function getStoreCameras(cameraList, branch) {
             var cameras = [];
             cameraList.map(function (camera) {
-                if (camera.FatherID == store.data.ID || $filter('filter')(_childStores[store.data.ID], { data: { ID: camera.FatherID } }).length > 0) {
+                if (camera.FatherID == branch.data.ID || $filter('filter')(_childStores[branch.data.ID], { ID: camera.FatherID }).length > 0) {
                     cameras.push(camera);
                 }
             });
             return cameras;
         }
 
-        function getStoreZones(zoneList, store) {
+        function getStoreZones(zoneList, branch) {
             var zones = [];
             zoneList.map(function (zone) {
-                if (zone.FatherID == store.data.ID || $filter('filter')(_childStores[store.data.ID], { data: { ID: zone.FatherID } }).length > 0) {
+                if (zone.FatherID == branch.data.ID || $filter('filter')(_childStores[branch.data.ID], { ID: zone.FatherID }).length > 0) {
                     zones.push(zone);
                 }
             });
@@ -141,7 +141,7 @@
 
         function getStoreBranch(treeData, store) {
             for (var p in treeData) {
-                if (!tree.hasOwnProperty(p))
+                if (!treeData.hasOwnProperty(p))
                     continue;
 
                 if (treeData[p].data.ID == store.ID) {
@@ -163,7 +163,7 @@
                 };
                 vm.tree.add_branch(parent, branch);
 
-                var children = getChildStores(_storeList, child);
+                var children = getChildren(_storeList, child);
                 children.map(function (child) {
                     addBranch(branch, child);
                 });
@@ -180,7 +180,7 @@
                 //    _initialSelection = rootBranch;
                 //}
 
-                var children = getChildStores(_storeList, parent);
+                var children = getChildren(_storeList, parent);
                 children.map(function (child) {
                     addBranch(rootBranch, child);
                 });
@@ -188,27 +188,27 @@
         }
 
         function onSelectedStore(branch) {
-            if (!vm.context.store || branch.data.ID != vm.context.store.data.ID) {
-                vm.context.store = branch;
+            if (!vm.context.store || branch.data.ID != vm.context.store.ID) {
+                vm.context.store = branch.data;
                 var storeId = branch.data.ID;
 
                 if (!_childStores[storeId]) {
-                    _childStores[storeId] = getChildBranches(branch);
+                    _childStores[storeId] = getChildStores(branch);
                 }
                 vm.context.childStores = _childStores[storeId];
 
                 if (!_parentStores[storeId]) {
-                    _parentStores[storeId] = getParentBranches(vm.tree, branch);
+                    _parentStores[storeId] = getParentStores(vm.tree, branch);
                 }
                 vm.context.parentStores = _parentStores[storeId];
 
                 if (!_companies[storeId]) {
-                    var companies = $filter('filter')(_parentStores[storeId], { data: { FatherID: null } });
+                    var companies = $filter('filter')(_parentStores[storeId], { FatherID: null });
                     if (companies.length) {
                         _companies[storeId] = companies[0];
                     }
                     else {
-                        _companies[storeId] = branch;
+                        _companies[storeId] = branch.data;
                     }
                 }
                 vm.context.company = _companies[storeId];
@@ -230,11 +230,11 @@
             }
         }
 
-        function selectStore(branch) {
+        function _selectStore(branch) {
             vm.tree.select_branch(branch);
         }
 
-        function _selectStore(store) {
+        function selectStore(store) {
             vm.tree.select_branch(getStoreBranch(vm.treeData, store));
         }
 
@@ -344,7 +344,7 @@
 //function addStores(fatherId) {
 //    var rootLocations = $filter('filter')(_storeList, { FatherID: fatherId });
 //    rootLocations.map(function (rootLocation) {
-//        var children = getChildStores(_storeList, rootLocation);
+//        var children = getChildren(_storeList, rootLocation);
 //        if (fatherId) {
 //            var rootLocationBranch = searchBranch(_treeData, rootLocation);
 //            if (rootLocationBranch) {
