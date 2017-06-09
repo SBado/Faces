@@ -64,7 +64,7 @@
 
                 vm.heatmaps.length = 0;
                 vm.heatmaps.push({
-                    dataPoints: dataPoints,
+                    points: angular.copy(points),
                     config: heatmapConfig,
                     maxValue: max
                 })
@@ -96,7 +96,7 @@
                     points.push({ id: dataKeys[2], value: 95 });
 
                     vm.heatmaps.push({
-                        dataPoints: points,
+                        points: angular.copy(points),
                         config: heatmapConfig,
                         maxValue: max
                     })

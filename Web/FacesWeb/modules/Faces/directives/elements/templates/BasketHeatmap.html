@@ -6,7 +6,7 @@
     <div class="row">
         <div class="col-sm-4"><h3>Baskets</h3></div>
     </div>   
-    <div class="row" ng-repeat="point in $ctrl.dataPoints">
+    <div class="row" ng-repeat="point in $ctrl.points">
         <div class="col-sm-4"><label>{{::$ctrl.getPointLabel(point)}}</label></div>
         <div class="col-sm-4">{{point.value}}</div>
     </div>

@@ -7,7 +7,7 @@
             controller: BasketHeatmapController,
             bindings: {
                 heatmapId: '<',
-                dataPoints: '<',
+                points: '<',
                 config: '<',
                 maxValue: '<'
             }
@@ -31,6 +31,8 @@
             _watch();
         }
 
+        ctrl.getPointLabel = getPointLabel;
+
         ctrl.$onInit = function () {
 
             
@@ -51,7 +53,7 @@
             ctrl.heatData = {
                 min: 0,
                 max: changesObj.maxValue.currentValue,
-                data: changesObj.dataPoints.currentValue
+                data: changesObj.points.currentValue
             }
         }
     }    
