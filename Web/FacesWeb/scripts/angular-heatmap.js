@@ -39,7 +39,10 @@
             }
             $scope.heatmapInstance.configure(nu);
           });
-          $scope.$watch('data', function(nu, old) {
+          $scope.$watch('data', function (nu, old) {
+              if (angular.equals(nu, old)) {
+                  return;
+              }
             $scope.heatmapInstance.setData(nu);
           }, true);
         }

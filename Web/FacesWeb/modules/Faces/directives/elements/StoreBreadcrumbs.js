@@ -39,12 +39,11 @@
             if (StoreTreeService.context.store) {                
 
                 if (StoreTreeService.context.parentStores) {
-                    StoreTreeService.context.parentStores.map(function (store) {
+                    StoreTreeService.context.parentStores.map(store =>
                         vm.breadCrumbs.push({
                             store: store,
                             name: store.Name
-                        });
-                    });
+                        }));
                 }
 
                 vm.breadCrumbs.push({

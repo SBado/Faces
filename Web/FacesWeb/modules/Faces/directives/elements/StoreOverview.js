@@ -130,9 +130,7 @@
 
         function setChartValues(chart, data) {
             var sum = 0;
-            data.map(function (value) {
-                sum += value;
-            })
+            data.map(value => sum += value);
             if (sum) {
                 chart.labels = chart.dataLabels;
                 chart.data = data;

@@ -107,25 +107,19 @@
         }        
 
         function getCompanies(stores) {
-            return ($filter('filter')(stores, { data: { FatherID: null } })).map(function (company) {
-                return company.data;
-            });
+            return ($filter('filter')(stores, { data: { FatherID: null } })).map(company => company.data);
         }
 
         function getBuildings(treeData, treeController) {
             var buildings = [];
-            treeData.map(function (branch) {
-                buildings = buildings.concat(treeController.get_children(branch));
-            });
+            treeData.map(branch => buildings = buildings.concat(treeController.get_children(branch)));
 
-            return buildings.map(function (building) {
-                return building.data;
-            });
+            return buildings.map(building => building.data);
         }
 
         function getStoreCameras(cameraList, branch) {
             var cameras = [];
-            cameraList.map(function (camera) {
+            cameraList.map(camera => {
                 if (camera.FatherID == branch.data.ID || $filter('filter')(_childStores[branch.data.ID], { ID: camera.FatherID }).length > 0) {
                     cameras.push(camera);
                 }
@@ -135,7 +129,7 @@
 
         function getStoreZones(zoneList, branch) {
             var zones = [];
-            zoneList.map(function (zone) {
+            zoneList.map(zone => {
                 if (zone.FatherID == branch.data.ID || $filter('filter')(_childStores[branch.data.ID], { ID: zone.FatherID }).length > 0) {
                     zones.push(zone);
                 }
@@ -168,9 +162,7 @@
                 vm.tree.add_branch(parent, branch);
 
                 var children = getChildren(_storeList, child);
-                children.map(function (child) {
-                    addBranch(branch, child);
-                });
+                children.map(child => addBranch(branch, child));
             }
             else {
                 var rootBranch = {
@@ -185,9 +177,7 @@
                 //}
 
                 var children = getChildren(_storeList, parent);
-                children.map(function (child) {
-                    addBranch(rootBranch, child);
-                });
+                children.map(child => addBranch(rootBranch, child));
             }
         }
 
@@ -288,17 +278,8 @@
                         _cameraList = $filter('filter')(response.data.value, { IsCamera: true });
                         _zoneList = $filter('filter')(response.data.value, { IsZone: true });
 
-                        $filter('filter')(response.data.value, { FatherID: null }).map(function (root) {
-                            addBranch(root);
-                        });
-                        //addStores(null);
-                        //vm.treeData = _treeData;
-                        //_treeData = angular.copy(vm.treeData);
-                        //_noLeafTreeData = angular.copy(vm.treeData);
-                        //angular.forEach(_noLeafTreeData, removeLeafBranches);                                                
-
-                        vm.tree.select_branch(vm.treeData[0]);
-                        //onSelectedStore(vm.treeData[0]);                  
+                        $filter('filter')(response.data.value, { FatherID: null }).map(root => addBranch(root));                       
+                        vm.tree.select_branch(vm.treeData[0]);                                     
                     }
                 }, function (error) {
                 });

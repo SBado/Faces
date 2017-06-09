@@ -21,11 +21,11 @@
             .state('home.baskets', {
                 url: "/baskets",
                 data: {
-                    title: 'Baskets Heatmap'
+                    title: 'Baskets Overview'
                 },
                 views: {
                     'pages': {
-                        template: '<basket-heatmap>'
+                        template: '<baskets-overview>'
                     }
                 }
             })
