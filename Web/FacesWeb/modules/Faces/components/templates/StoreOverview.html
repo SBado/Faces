@@ -1,19 +1,19 @@
 ﻿<!--<div class="container-fluid">
     <div class="row">
         <div class="col-sm-3">
-            <canvas id="pie-sex" class="chart chart-pie chart-xs overview-chart-pie" chart-data="vm.sexData" chart-labels="vm.sexLabels" chart-options="vm.options"></canvas>
+            <canvas id="pie-sex" class="chart chart-pie chart-xs overview-chart-pie" chart-data="$ctrl.sexData" chart-labels="$ctrl.sexLabels" chart-options="$ctrl.options"></canvas>
         </div>
         <div class="col-sm-3">
-            <canvas id="pie-glasses" class="chart chart-pie chart-xs overview-chart-pie" chart-data="vm.glassesData" chart-labels="vm.glassesLabels" chart-options="vm.options"></canvas>
+            <canvas id="pie-glasses" class="chart chart-pie chart-xs overview-chart-pie" chart-data="$ctrl.glassesData" chart-labels="$ctrl.glassesLabels" chart-options="$ctrl.options"></canvas>
         </div>
         <div class="col-sm-3">
-            <canvas id="pie-beard" class="chart chart-pie chart-xs overview-chart-pie" chart-data="vm.beardData" chart-labels="vm.beardLabels" chart-options="vm.options"></canvas>
+            <canvas id="pie-beard" class="chart chart-pie chart-xs overview-chart-pie" chart-data="$ctrl.beardData" chart-labels="$ctrl.beardLabels" chart-options="$ctrl.options"></canvas>
         </div>
     </div>
 </div>-->
 <div class="container-fluid">
     <div class="row">
-        <div ng-repeat="chart in vm.charts">
+        <div ng-repeat="chart in $ctrl.charts">
             <div class="col-xs-6 col-sm-4">
                 <canvas id="chart.id" class="chart chart-pie chart-xs" chart-data="chart.data" chart-labels="chart.labels" chart-options="chart.options" chart-dataset-override="chart.chartsOverride"></canvas>
             </div>

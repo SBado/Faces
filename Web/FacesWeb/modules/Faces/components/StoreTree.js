@@ -2,34 +2,17 @@
     'use strict';
 
     angular.module('portal')
-        .directive('storeTree', storeTreeDirective)
-        .controller('StoreTreeController', StoreTreeController)
-
-    function storeTreeDirective() {
-        return {
-            restrict: 'E',
-            templateUrl: 'modules/Faces/directives/elements/templates/StoreTree.html',
-            controller: StoreTreeController,
-            controllerAs: 'ctrl',
-            scope: {},
-            bindToController: {
-                selectedStore: '=',
-                parentStores: '=',
-                childStores: '=',
-                cameras: '='                
-            },
-            link: function (scope, element, attrs, controller) {
-
-            }
-        };
-    }
+        .component('storeTree', {
+            templateUrl: 'modules/Faces/components/templates/StoreTree.html',
+            controller: StoreTreeController
+        });
 
     function StoreTreeController($rootScope, $scope, $filter, StoreTreeService, WebApiService) {
 
         var ctrl = this;
         var _context = {
             tree: {}
-        };        
+        };
         var _treeData = [];
         var _noLeafTreeData = [];
         var _initialSelection = null;
@@ -106,7 +89,7 @@
             }
 
             return context.locations;
-        }        
+        }
 
         function getCompanies(stores) {
             return ($filter('filter')(stores, { data: { FatherID: null } })).map(company => company.data);
@@ -223,6 +206,10 @@
                     _zones[storeId] = getStoreZones(_zoneList, branch);
                 }
                 _context.zones = _zones[storeId];
+
+
+
+                StoreTreeService.setContext(_context);
             }
         }
 
@@ -237,7 +224,7 @@
         function init() {
             ctrl.tree = {};
             ctrl.treeData = [];
-            
+
             _context.tree.companies = null;
             _context.tree.buildings = null;
             _context.company = null;
@@ -249,26 +236,7 @@
             _context.cameras = null;
 
             ctrl.onSelectedStore = onSelectedStore;
-
-            _deregisterWatch = $scope.$watch('ctrl.treeData', function (newValue, oldValue) {
-                if (newValue == oldValue || (newValue.length && !newValue[0].uid)) {
-                    return;
-                }
-
-                _deregisterWatch();                
-
-                _context.tree.companies = getCompanies(ctrl.treeData);
-                _context.tree.buildings = getBuildings(ctrl.treeData, ctrl.tree);
-
-                StoreTreeService.context = _context;
-                StoreTreeService.storeTreeApi = {
-                    selectStore: selectStore                    
-                };
-
-                StoreTreeService.treeLoaded = true;
-                $rootScope.$broadcast('tree-loaded');
-
-            }, true)
+            StoreTreeService.setApi({ selectStore: selectStore });
 
             WebApiService.getStoreTrees()
                 .then(function (response) {
@@ -277,19 +245,18 @@
                         _cameraList = $filter('filter')(response.data.value, { IsCamera: true });
                         _zoneList = $filter('filter')(response.data.value, { IsZone: true });
 
-                        $filter('filter')(response.data.value, { FatherID: null }).map(root => addBranch(root));                       
-                        ctrl.tree.select_branch(ctrl.treeData[0]);                                     
+                        $filter('filter')(response.data.value, { FatherID: null }).map(root => addBranch(root));
+                        ctrl.tree.select_branch(ctrl.treeData[0]);
+                        _context.tree.companies = getCompanies(ctrl.treeData);
+                        _context.tree.buildings = getBuildings(ctrl.treeData, ctrl.tree);
                     }
                 }, function (error) {
                 });
         }
 
-        init();
+        ctrl.$onInit = init;
 
     }
-
-    StoreTreeController.$inject = ['$rootScope', '$scope', '$filter', 'StoreTreeService', 'WebApiService'];
-
 })();
 
 

@@ -1,5 +1,5 @@
 ﻿(function () {
-    var app = angular.module('faces', ['portal', 'angularBootstrapNavTree', 'chart.js', 'heatmap']);   
+    var app = angular.module('faces', ['portal', 'rx', 'angularBootstrapNavTree', 'chart.js', 'heatmap']);   
 
     app.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, $urlRouterProvider) {
 

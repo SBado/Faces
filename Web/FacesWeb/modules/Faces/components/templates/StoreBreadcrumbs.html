@@ -1,0 +1,5 @@
+﻿<ul class="nav nav-pills">
+    <li ng-repeat='bc in $ctrl.breadCrumbs' class="presentation" ng-class="{'active': {{$last}} }">
+        <a href="#" ng-click="$ctrl.selectStore($index)">{{bc.name}}</a>        
+    </li>
+</ul>

@@ -35,14 +35,14 @@
             return getAll(url, options);
         }
 
-        self.getFacesInStore = function (date) {
+        self.getFacesInStore = function (date, cameras) {
             //var dateFilter = 'year(EntranceTimestamp) eq ' + date.getFullYear() +
             var dateFilter = 'year(EntranceTimestamp) eq ' + 2016 +
                 ' and month(EntranceTimestamp) eq ' + (date.getMonth() + 1) +
                 ' and day(EntranceTimestamp) eq ' + date.getDate();
 
             var cameraFilter = '';
-            StoreTreeService.context.cameras.map(function (camera) {
+            cameras.map(function (camera) {
                 cameraFilter += 'EntranceCamera eq ' + camera.ID + ' or '
             });
 
@@ -62,9 +62,9 @@
             return getAll(url, options);
         }
 
-        self.getBasketsInStore = function () {
+        self.getBasketsInStore = function (zones) {
             var zoneFilter = '';
-            StoreTreeService.context.zones.map(function (zone) {
+            zones.map(function (zone) {
                 zoneFilter += 'CurrentZone eq ' + zone.ID + ' or '
             });
 

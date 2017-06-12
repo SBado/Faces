@@ -3,7 +3,7 @@
 
     angular.module('faces')
         .component('basketHeatmap', {
-            templateUrl: 'modules/Faces/directives/elements/templates/BasketHeatmap.html',
+            templateUrl: 'modules/Faces/components/templates/BasketHeatmap.html',
             controller: BasketHeatmapController,
             bindings: {
                 heatmapId: '<',
