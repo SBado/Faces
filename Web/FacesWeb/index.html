@@ -1,19 +1,21 @@
 ﻿<!DOCTYPE html>
 <html ng-app="faces">
 <head>
-    <script src="//code.jquery.com/jquery-2.1.4.min.js"></script>
-    <script src="//code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>    
-    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>    
     <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
     <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular-route.min.js"></script>
     <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular-animate.min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.4/angular-resource.js"></script>
-	<script src="//cdnjs.cloudflare.com/ajax/libs/angular-ui-router/1.0.3/angular-ui-router.min.js"></script>
-    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-aria.min.js"></script>
-    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-messages.min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/angular-material/1.1.4/angular-material.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular-aria.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular-messages.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/angular_material/1.1.4/angular-material.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.4/angular-resource.js"></script>        
+    <!--<scritp src="//cdnjs.cloudflare.com/ajax/libs/angular-filter/0.5.16/angular-filter.min.js"></scritp>-->
+    <script src="scripts/angular-filter.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
     <script src="//cdn.jsdelivr.net/angular.chartjs/latest/angular-chart.min.js"></script>
+    <script src="//unpkg.com/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="//unpkg.com/angular-ui-router/release/angular-ui-router.min.js"></script>
     <script src="//unpkg.com/rx/dist/rx.all.js"></script>
     <script src="//unpkg.com/rx-angular/dist/rx.angular.js"></script>
     <script src="//rawgit.com/Templarian/ui.bootstrap.contextMenu/master/contextMenu.js"></script>
@@ -21,8 +23,8 @@
     <script src="//rawgit.com/jmdobry/angular-cache/master/dist/angular-cache.min.js"></script>
     <script src="//rawgit.com/angular-ui/ui-validate/master/dist/validate.min.js"></script>
     <script src="//rawgit.com/bitwiseshiftleft/sjcl/master/sjcl.js"></script>
-    <script src="//rawgit.com/grevory/angular-local-storage/master/dist/angular-local-storage.min.js"></script>    
-    <!--<script src="//rawgit.com/emn178/Chart.PieceLabel.js/master/build/Chart.PieceLabel.min.js"></script>-->   
+    <script src="//rawgit.com/grevory/angular-local-storage/master/dist/angular-local-storage.min.js"></script>
+    <!--<script src="//rawgit.com/emn178/Chart.PieceLabel.js/master/build/Chart.PieceLabel.min.js"></script>-->
     <!--<script src="//rawgit.com/pa7/heatmap.js/master/build/heatmap.min.js"></script>-->
     <script src="scripts/heatmap.js"></script>
     <!--<script src="//rawgit.com/pa7/heatmap.js/master/plugins/svg-area-heatmap.js"></script>-->
@@ -49,26 +51,17 @@
     <script src="modules/Portal/controllers/LoginForm.js"></script>
     <script src="modules/Portal/controllers/SettingsForm.js"></script>
     <script src="modules/Portal/directives/elements/MainView.js"></script>
-    <script src="modules/Faces/directives/elements/_StoreTree.js"></script>
+    <script src="modules/Faces/components/StoreTree.js"></script>
     <script src="modules/Faces/components/StoreBreadcrumbs.js"></script>
     <script src="modules/Faces/components/StoreOverview.js"></script>
     <script src="modules/Faces/components/BasketHeatmap.js"></script>
-    <script src="modules/Faces/components/BasketsOverview.js"></script>
-    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
-    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
-    <link rel="stylesheet" href="//code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
-    <link rel="stylesheet" href="styles/style.css">
-    <link href="styles/abn_tree.css" rel="stylesheet" />
-    <!--<link rel="stylesheet" href="styles/MonthScheduler.css">
-    <link rel="stylesheet" href="styles/DayScheduler.css">
-    <link rel="stylesheet" href="styles/SettingsForm.css">
-    <link rel="stylesheet" href="styles/Slider.css">
-    <link rel="stylesheet" href="styles/TemperatureControl.css">
-    <link rel="stylesheet" href="styles/TemperatureGauge.css">
-    <link rel="stylesheet" href="styles/WeekScheduler.css">-->
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/angular-material/1.1.4/angular-material.min.css">
+    <script src="modules/Faces/components/BasketsOverview.js"></script>    
+    <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
+    <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/angular_material/1.1.4/angular-material.min.css">
+    <link rel="stylesheet" href="//unpkg.com/bootstrap/dist/css/bootstrap.min.css">    
     <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
-
+    <link rel="stylesheet" href="styles/style.css">
+    <link href="styles/abn_tree.css" rel="stylesheet" />          
 </head>
 <body ng-controller="ParentController">
     <div class="noselect" ui-view="main-view"></div>

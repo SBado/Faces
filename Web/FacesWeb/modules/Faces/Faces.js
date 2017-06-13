@@ -1,12 +1,12 @@
 ﻿(function () {
-    var app = angular.module('faces', ['portal', 'rx', 'angularBootstrapNavTree', 'chart.js', 'heatmap']);   
+    var app = angular.module('faces', ['portal', 'rx', 'angular.filter', 'angularBootstrapNavTree', 'chart.js', 'heatmap']);   
 
     app.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, $urlRouterProvider) {
 
         // For any unmatched url, redirect to /state1
         $urlRouterProvider.otherwise("/home/overview");
 
-        $stateProvider           
+        $stateProvider
             .state('home.overview', {
                 url: "/overview",
                 data: {
@@ -14,7 +14,7 @@
                 },
                 views: {
                     'pages': {
-                        template: "<store-overview>"            
+                        template: "<store-overview>"
                     }
                 }
             })
@@ -29,5 +29,10 @@
                     }
                 }
             })
-    }]);    
+    }])
+        .run(function () {
+            String.prototype.formatStoreName = function () {
+                return this.toLowerCase().replace(/ /g, '_');
+            };
+        });    
 })();

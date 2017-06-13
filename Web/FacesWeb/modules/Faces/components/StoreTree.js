@@ -114,11 +114,17 @@
 
         function getStoreZones(zoneList, branch) {
             var zones = [];
-            zoneList.map(zone => {
-                if (zone.FatherID == branch.data.ID || $filter('filter')(_childStores[branch.data.ID], { ID: zone.FatherID }).length > 0) {
-                    zones.push(zone);
-                }
-            });
+
+            if (branch.data.IsZone) {
+                zones.push(branch.data);
+            }
+            else {
+                zoneList.map(zone => {
+                    if (zone.FatherID == branch.data.ID || $filter('filter')(_childStores[branch.data.ID], { ID: zone.FatherID }).length > 0) {
+                        zones.push(zone);
+                    }
+                });
+            }
             return zones;
         }
 
@@ -206,8 +212,6 @@
                     _zones[storeId] = getStoreZones(_zoneList, branch);
                 }
                 _context.zones = _zones[storeId];
-
-
 
                 StoreTreeService.setContext(_context);
             }
