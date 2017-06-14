@@ -1,14 +1,14 @@
 ﻿<md-toolbar class="md-whiteframe-8dp">
     <div class="md-toolbar-tools">
-        <md-button class="md-icon-button" ng-click="vm.closeTreePanel(); vm.openMenuPanel()">
+        <md-button class="md-icon-button" ng-click="vm.closeTreePanel(); vm.openMenuPanel()" ng-if="userAuthenticated()">
             <md-tooltip md-autohide="true">Menu</md-tooltip>
             <md-icon class="md-default-theme material-icons">menu</md-icon>
         </md-button>
-        <span>{{title}}</span>
+        <span>{{pageTitle}}</span>
         <span flex=""></span>
     </div>
 </md-toolbar>
-<md-sidenav class="md-sidenav-left" md-component-id="menu">
+<md-sidenav class="md-sidenav-left" md-component-id="menu" ng-if="userAuthenticated()">
     <md-toolbar layout="row">
         <div class="md-toolbar-tools">
             <i class="material-icons" style="margin-right:10px;">face</i>
@@ -51,7 +51,7 @@
 
 
 
-<md-content ng-show="userAuthenticated()">
+<md-content ng-if="userAuthenticated()">
     <div class="overlay flexbox-row" ng-show="loadingView">
         <md-progress-circular md-mode="indeterminate"></md-progress-circular>
     </div>

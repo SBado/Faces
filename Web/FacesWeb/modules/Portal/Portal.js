@@ -56,7 +56,7 @@
         });
 
         $transitions.onSuccess({}, function (trans) {
-            $rootScope.title = $state.current.data.title;
+            $rootScope.pageTitle = $state.current.data ? $state.current.data.pageTitle : 'Faces';
             $rootScope.loadingView = false;            
         });
 

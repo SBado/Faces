@@ -2,13 +2,14 @@
     "use strict";
 
     angular.module("portal")
-        .factory("AuthenticationService", ['$rootScope', '$http', 'UserService', 'TokenService', 'AUTH_EVENTS', AuthenticationService]);
+        .factory("AuthenticationService", ['$rootScope', '$q', '$http', 'UserService', 'TokenService', 'AUTH_EVENTS', AuthenticationService]);
 
-    function AuthenticationService($rootScope, $http, UserService, TokenService, AUTH_EVENTS) {
+    function AuthenticationService($rootScope, $q, $http, UserService, TokenService, AUTH_EVENTS) {
 
         console.log('AuthenticationService instantiated');
 
         var self = this;
+        var logged = false;
 
         function generateHashedPassword(username, password) {
             var salt = sjcl.hash.sha256.hash(username + password);
@@ -29,36 +30,38 @@
         self.login = function (user, success, error) {
             var hashedPassword = generateHashedPassword(user.username, user.password);
             var credentials = btoa(user.username + ':' + hashedPassword)
-            var promise = $http.post(
-                'php/TokenGeneration.php',
-                {
-                    grant_type: 'client_credentials'
-                },
-                {
-                    headers: { 'Authorization': 'Basic ' + credentials }
-                }
-            );
-            promise.then(function successCallback(response) {
-                TokenService.setToken(response.data.access_token);
+            //var promise = $http.post(
+            //    'php/TokenGeneration.php',
+            //    {
+            //        grant_type: 'client_credentials'
+            //    },
+            //    {
+            //        headers: { 'Authorization': 'Basic ' + credentials }
+            //    }
+            //);
+            //promise.then(function successCallback(response) {
+                //TokenService.setToken(response.data.access_token);
+                logged = true;
                 UserService.setCurrentUser(user.username);
                 $rootScope.$broadcast(AUTH_EVENTS.loginSuccess);
-                success(response.data.access_token);
-            }, function errorCallback(e) {
-                console.log(e);
-                $rootScope.$broadcast(AUTH_EVENTS.loginFailed);
-                error(e);
-            });
+            //    success(response.data.access_token);
+            //}, function errorCallback(e) {
+            //    console.log(e);
+            //    $rootScope.$broadcast(AUTH_EVENTS.loginFailed);
+            //    error(e);
+            //});
 
-            return promise;
+            //return promise;            
         }
         //check if the user is authenticated
         self.userAuthenticated = function () {
             //return TokenService.getToken() != '';
-            return true;
+            return logged;
         };
         //log out the user and broadcast the logoutSuccess event
         self.logOut = function () {
-            TokenService.deleteToken();
+            //TokenService.deleteToken();
+            logged = false;
             UserService.unsetCurrentUser();
             $rootScope.$broadcast(AUTH_EVENTS.logoutSuccess);
         }

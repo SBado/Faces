@@ -10,7 +10,7 @@
             .state('home.overview', {
                 url: "/overview",
                 data: {
-                    title: 'Overview'
+                    pageTitle: 'Overview'
                 },
                 views: {
                     'pages': {
@@ -21,7 +21,7 @@
             .state('home.baskets', {
                 url: "/baskets",
                 data: {
-                    title: 'Baskets Overview'
+                    pageTitle: 'Baskets Overview'
                 },
                 views: {
                     'pages': {

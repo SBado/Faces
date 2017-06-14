@@ -4,12 +4,12 @@
     'use strict';
 
     angular.module('portal')
-           .controller('LoginController', LoginController)
+        .controller('LoginController', LoginController)
 
     function LoginController($scope, $state, $uibModalInstance, AuthenticationService) {
 
         var vm = this;
-     
+
         function init() {
             vm.signupMode = false;
             vm.credentials = {};
@@ -27,15 +27,18 @@
                 vm.error = true;
                 vm.errorNumber = errorNumber;
             });
-        };        
+        };
         function login(credentials) {
             vm.error = false;
-            AuthenticationService.login(credentials, function (user) {
-                $uibModalInstance.close();
-                $state.go('home.manualcontrol');
-            }, function (err) {                
-                vm.error = true;
-            });
+            //AuthenticationService.login(credentials, function (user) {
+            //    $uibModalInstance.close();
+            //    $state.go('home.manualcontrol');
+            //}, function (err) {                
+            //    vm.error = true;
+            //});
+            AuthenticationService.login(credentials);
+            $uibModalInstance.close();
+            $state.go('home.overview');
         };
         function submit() {
             vm.submitted = true;
@@ -44,7 +47,7 @@
             }
             else if (vm.loginForm.$valid && !vm.signupMode) {
                 login(vm.credentials);
-            }            
+            }
         };
 
         init();

@@ -23,7 +23,7 @@
             if (!$scope.loginShown) {
                 $scope.loginShown = true;
                 var modalInstance = $uibModal.open({
-                    templateUrl: 'controllers/templates/LoginForm.html',
+                    templateUrl: 'modules/Portal/controllers/templates/LoginForm.html',
                     controller: 'LoginController as vm',
                     backdrop: 'static'
                 });
