@@ -9,11 +9,13 @@
 
     function BasketsOverviewController($filter, StoreTreeService, WebApiService) {
         var $ctrl = this;
-        var _subscription = null;        
+        var _subscription = null;
         var _imagesBasePath = 'modules/Faces/images/stores';
-       
+
         function init() {
             _subscription = StoreTreeService.subscribe(reload);
+            $ctrl.storeId = null;
+            $ctrl.heatmaps = {};
 
             if (StoreTreeService.getContext()) {
                 reload();
@@ -22,47 +24,25 @@
 
         function reload() {
             var context = StoreTreeService.getContext();
+            $ctrl.storeId = context.store.ID
+
+            if ($ctrl.heatmaps[$ctrl.storeId]) {
+                return;
+            }
 
             WebApiService.getBasketsInStore(context.zones).then(function (response) {
-                if (response.status == 200 && response.data.value.length) {
-                    var totalBaskets = response.data.value.length;
+                if (response.status == 200 && response.data.value.length) {                   
                     var zones = $filter('groupBy')(response.data.value, 'CurrentZone');
                     var dataPoints = [];
                     angular.forEach(zones, function (baskets, zoneId) {
-                        var zoneName = $filter('filter')(context.zones, { ID: zoneId })[0].Name.formatStoreName();                        
+                        var zoneName = $filter('filter')(context.zones, { ID: zoneId })[0].Name.formatStoreName();
                         dataPoints.push({
                             id: zoneName,
                             value: baskets.length
                         });
-                    });
+                    });                    
 
-                    $ctrl.heatmaps = [];
-
-                    if (context.store.IsZone) {
-                        var company = context.company.Name.formatStoreName();
-                        var building = context.building.Name.formatStoreName();
-                        var zone = context.store.Name.formatStoreName();
-                        var svgPath = [_imagesBasePath, company, building, zone].join('/') + '.svg';
-
-                        var heatmapConfig = {
-                            svgUrl: svgPath,
-                            plugin: 'SvgAreaHeatmap',
-                            gradient: {
-                                '0.33': "rgb(0,255,0)",
-                                '0.66': "rgb(255,140,0)",
-                                '1': "red",
-                            },
-                        }                     
-
-                        $ctrl.heatmaps.length = 0;
-                        $ctrl.heatmaps.push({
-                            points: angular.copy(dataPoints),
-                            config: heatmapConfig,
-                            maxValue: totalBaskets
-                        })
-                    }
-
-                    else if (context.building) {
+                    if (!context.store.IsZone && context.building) {
                         var company = context.company.Name.formatStoreName();
                         var building = context.building.Name.formatStoreName();
                         var svgPath = [_imagesBasePath, company, building, 'store.svg'].join('/');
@@ -76,42 +56,79 @@
                                 '1': "red",
                             },
                         }
-                      
-                        $ctrl.heatmaps.length = 0;
-                        $ctrl.heatmaps.push({
+
+                        $ctrl.heatmaps[$ctrl.storeId] = [];
+                        $ctrl.heatmaps[$ctrl.storeId].push({
                             points: angular.copy(dataPoints),
                             config: heatmapConfig,
-                            maxValue: totalBaskets
+                            maxValue: response.data.value.length
                         })
                     }
 
-                    else if (context.company) {
-                        var svgPaths = [];
-                        context.tree.buildings.map(building => {
-                            var company = context.company.Name.formatStoreName();
-                            var svgPath = [_imagesBasePath, company, building.Name.formatStoreName(), 'store.svg'].join('/');
-                            svgPaths.push(svgPath);
-                        });
+                    else {
+                        var zones = null;
+                        if (context.store.IsZone) {
+                            zones = StoreTreeService.getApi().getBuildingZones(context.building);
+                        }
+                        else {
+                            zones = StoreTreeService.getApi().getCompanyZones(context.store);
+                        }
+                        WebApiService.getBasketsInStoreCount(zones).then(function (res) {
+                            if (res.status == 200) {
+                                if (context.store.IsZone) {
+                                    var company = context.company.Name.formatStoreName();
+                                    var building = context.building.Name.formatStoreName();
+                                    var zone = context.store.Name.formatStoreName();
+                                    var svgPath = [_imagesBasePath, company, building, zone].join('/') + '.svg';
 
-                        $ctrl.heatmaps.length = 0;
-                        svgPaths.map(svgPath => {
-                            var heatmapConfig = {
-                                svgUrl: svgPath,
-                                plugin: 'SvgAreaHeatmap',
-                                gradient: {
-                                    '0.33': "rgb(0,255,0)",
-                                    '0.66': "rgb(255,140,0)",
-                                    '1': "red",
-                                },
-                            }                           
+                                    var heatmapConfig = {
+                                        svgUrl: svgPath,
+                                        plugin: 'SvgAreaHeatmap',
+                                        gradient: {
+                                            '0.33': "rgb(0,255,0)",
+                                            '0.66': "rgb(255,140,0)",
+                                            '1': "red",
+                                        },
+                                    }
 
-                            $ctrl.heatmaps.push({
-                                points: angular.copy(dataPoints),
-                                config: heatmapConfig,
-                                maxValue: totalBaskets
-                            })
+                                    $ctrl.heatmaps[$ctrl.storeId] = [];
+                                    $ctrl.heatmaps[$ctrl.storeId].push({
+                                        points: angular.copy(dataPoints),
+                                        config: heatmapConfig,
+                                        maxValue: res.data
+                                    })
+                                }
+
+                                else if (context.company) {
+                                    var svgPaths = [];
+                                    context.tree.buildings.map(building => {
+                                        var company = context.company.Name.formatStoreName();
+                                        var svgPath = [_imagesBasePath, company, building.Name.formatStoreName(), 'store.svg'].join('/');
+                                        svgPaths.push(svgPath);
+                                    });
+
+                                    $ctrl.heatmaps[$ctrl.storeId] = [];
+                                    svgPaths.map(svgPath => {
+                                        var heatmapConfig = {
+                                            svgUrl: svgPath,
+                                            plugin: 'SvgAreaHeatmap',
+                                            gradient: {
+                                                '0.33': "rgb(0,255,0)",
+                                                '0.66': "rgb(255,140,0)",
+                                                '1': "red",
+                                            },
+                                        }
+
+                                        $ctrl.heatmaps[$ctrl.storeId].push({
+                                            points: angular.copy(dataPoints),
+                                            config: heatmapConfig,
+                                            maxValue: res.data
+                                        })
+                                    });
+                                }
+                            }
                         });
-                    } 
+                    }
                 }
             });
 
@@ -119,7 +136,7 @@
             //dataPoints.push({ id: dataKeys[1], value: 60 });
             //dataPoints.push({ id: dataKeys[2], value: 95 });
 
-           
+
         }
 
         //function reload() {

@@ -6,6 +6,8 @@ using System.Web.Http.OData.Builder;
 using System.Web.Http.OData.Extensions;
 using FacesApi.Models;
 using System.Web.Http.Cors;
+using System.Web.Http.OData.Routing.Conventions;
+using FacesApi.Helpers;
 
 namespace FacesApi
 {
@@ -32,7 +34,11 @@ namespace FacesApi
             builder.EntitySet<Face>("Faces");
             builder.EntitySet<StoreTree>("StoreTrees");
             builder.EntitySet<ZoneMonitoring>("ZoneMonitorings");
-            config.Routes.MapODataServiceRoute("odata", "odata", builder.GetEdmModel());
+
+            IList<IODataRoutingConvention> conventions = ODataRoutingConventions.CreateDefault();
+            conventions.Insert(0, new CountODataRoutingConvention()); // allow $count segments in WebAPI OData
+
+            config.Routes.MapODataServiceRoute("odata", "odata", builder.GetEdmModel(), new CountODataPathHandler(), conventions);
         }
     }
 }

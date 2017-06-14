@@ -215,14 +215,26 @@
 
                 StoreTreeService.setContext(_context);
             }
-        }
-
-        function _selectStore(branch) {
-            ctrl.tree.select_branch(branch);
-        }
+        }        
 
         function selectStore(store) {
             ctrl.tree.select_branch(getStoreBranch(ctrl.treeData, store));
+        }
+
+        function getCompanyZones(company) {
+            if (!_zones[company.ID]) {
+                _zones[company.ID] = getStoreZones(_zoneList, getStoreBranch(vm.treeData, company));
+            }
+
+            return angular.copy(_zones[company.ID]);
+        }
+
+        function getBuildingZones(building) {
+            if (!_zones[building.ID]) {
+                _zones[building.ID] = getStoreZones(_zoneList, getStoreBranch(vm.treeData, building));
+            }
+
+            return angular.copy(_zones[building.ID]);
         }
 
         function init() {
@@ -240,7 +252,11 @@
             _context.cameras = null;
 
             ctrl.onSelectedStore = onSelectedStore;
-            StoreTreeService.setApi({ selectStore: selectStore });
+            StoreTreeService.setApi({
+                selectStore: selectStore,
+                getCompanyZones: getCompanyZones,
+                getBuildingZones: getBuildingZones
+            });
 
             WebApiService.getStoreTrees()
                 .then(function (response) {

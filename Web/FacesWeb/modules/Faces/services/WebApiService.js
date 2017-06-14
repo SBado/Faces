@@ -62,6 +62,11 @@
             return getAll(url, options);
         }
 
+        self.getBasketsCount = function (options) {
+            var url = baseUrl + '/Baskets/$count/';
+            return getAll(url, options);
+        }
+
         self.getBasketsInStore = function (zones) {
             var zoneFilter = '';
             zones.map(function (zone) {
@@ -71,6 +76,21 @@
             if (zoneFilter) {
                 zoneFilter = zoneFilter.slice(0, -4);
                 return self.getBaskets('$filter=' + zoneFilter);
+            }
+            else {
+                return createEmptyResponse();
+            }
+        }
+
+        self.getBasketsInStoreCount = function (zones) {
+            var zoneFilter = '';
+            zones.map(function (zone) {
+                zoneFilter += 'CurrentZone eq ' + zone.ID + ' or '
+            });
+
+            if (zoneFilter) {
+                zoneFilter = zoneFilter.slice(0, -4);
+                return self.getBasketsCount('$filter=' + zoneFilter);
             }
             else {
                 return createEmptyResponse();
