@@ -145,13 +145,22 @@
                 if (response.status == 200 && response.data.value.length) {
                     _faces = response.data.value;
 
-                    var males = $filter('filter')(_faces, { Gender: 'M' }).length;
-                    var females = _faces.length - males;
-                    var glasses = $filter('filter')(_faces, { Eyeglasses: true }).length;
-                    var noGlasses = _faces.length - glasses;
+                    //var males = $filter('filter')(_faces, { Gender: 'M' }).length;                    
+                    //var females = _faces.length - males;
+                    var sexes = $filter('countBy')(_faces, 'Gender');
+                    var males = sexes.M;
+                    var females = sexes.F;
+
+                    //var glasses = $filter('filter')(_faces, { Eyeglasses: true }).length;
+                    //var noGlasses = _faces.length - glasses;
+                    var eyeGlasses = $filter('countBy')(_faces, 'Eyeglasses');
+                    var glasses = eyeGlasses.true;
+                    var noGlasses = eyeGlasses.false;
+
                     var beard = $filter('filter')(_faces, greaterThanPredicate('Beard', 0)).length;
-                    var mustaches = $filter('filter')(_faces, greaterThanPredicate('Beard', 0)).length;
-                    var nothing = _faces.length > (beard + mustaches) ? _faces.length - (beard + mustaches) : 0;
+                    var mustaches = $filter('filter')(_faces, greaterThanPredicate('Mustaches', 0)).length;
+                    var nothing = _faces.length > (beard + mustaches) ? _faces.length - (beard + mustaches) : 0;                    
+
                     var children = $filter('filter')(_faces, lessThanPredicate('Age', 13)).length;
                     var teens = $filter('filter')(_faces, betweenPredicate('Age', 13, 19)).length;
                     var adults = $filter('filter')(_faces, betweenPredicate('Age', 20, 60)).length;
