@@ -56,7 +56,8 @@
         //check if the user is authenticated
         self.userAuthenticated = function () {
             //return TokenService.getToken() != '';
-            return logged;
+            //return logged;
+            return true;
         };
         //log out the user and broadcast the logoutSuccess event
         self.logOut = function () {

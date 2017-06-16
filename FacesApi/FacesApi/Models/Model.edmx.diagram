@@ -11,6 +11,8 @@
         <EntityTypeShape EntityType="FacesModel.StoreTree" Width="1.5" PointX="2.75" PointY="3.75" IsExpanded="true" />
         <EntityTypeShape EntityType="FacesModel.ZoneMonitoring" Width="1.5" PointX="4.75" PointY="0.75" IsExpanded="true" />
         <EntityTypeShape EntityType="FacesModel.Configuration" Width="1.5" PointX="4.75" PointY="3.75" IsExpanded="true" />
+        <AssociationConnector Association="FacesModel.FK_EntranceCamera_ID" />
+        <AssociationConnector Association="FacesModel.FK_ExitCamera_ID" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

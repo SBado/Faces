@@ -29,6 +29,17 @@
                     }
                 }
             })
+            .state('home.cameras', {
+                url: "/cameras",
+                data: {
+                    pageTitle: 'Cameras Overview'
+                },
+                views: {
+                    'pages': {
+                        template: '<cameras-overview>'
+                    }
+                }
+            })
     }])
         .run(function () {
             String.prototype.formatStoreName = function () {

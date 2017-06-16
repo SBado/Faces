@@ -36,8 +36,8 @@
         }
 
         self.getFacesInStore = function (date, cameras) {
-            //var dateFilter = 'year(EntranceTimestamp) eq ' + date.getFullYear() +
-            var dateFilter = 'year(EntranceTimestamp) eq ' + 2016 +
+            var dateFilter = 'year(EntranceTimestamp) eq ' + date.getFullYear() +
+            //var dateFilter = 'year(EntranceTimestamp) eq ' + 2016 +
                 ' and month(EntranceTimestamp) eq ' + (date.getMonth() + 1) +
                 ' and day(EntranceTimestamp) eq ' + date.getDate();
 

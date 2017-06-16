@@ -12,6 +12,8 @@ using System.Web.Http.OData;
 using System.Web.Http.OData.Routing;
 using FacesApi.Models;
 using FacesApi.Hubs;
+using System.Web.Http.OData.Query;
+using System.Text;
 
 namespace FacesApi.Controllers
 {
@@ -41,6 +43,15 @@ namespace FacesApi.Controllers
         public SingleResult<StoreTree> GetStoreTree([FromODataUri] int key)
         {
             return SingleResult.Create(db.StoreTrees.Where(storeTree => storeTree.ID == key));
+        }
+
+        public HttpResponseMessage GetCount(ODataQueryOptions<StoreTree> queryOptions)
+        {
+            IQueryable<StoreTree> queryResults = queryOptions.ApplyTo(GetStoreTrees()) as IQueryable<StoreTree>;
+            int count = queryResults.Count();
+            HttpResponseMessage response = new HttpResponseMessage(HttpStatusCode.OK);
+            response.Content = new StringContent(count.ToString(), Encoding.UTF8, "text/plain");
+            return response;
         }
 
         // PUT: odata/StoreTrees(5)

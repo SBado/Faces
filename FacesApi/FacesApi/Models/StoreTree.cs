@@ -14,11 +14,23 @@ namespace FacesApi.Models
     
     public partial class StoreTree
     {
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
+        public StoreTree()
+        {
+            this.CameraInFaces = new HashSet<Face>();
+            this.CameraOutFaces = new HashSet<Face>();
+        }
+    
         public int ID { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
         public bool IsCamera { get; set; }
         public bool IsZone { get; set; }
         public Nullable<int> FatherID { get; set; }
+    
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Face> CameraInFaces { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Face> CameraOutFaces { get; set; }
     }
 }

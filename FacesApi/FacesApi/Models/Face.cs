@@ -27,5 +27,8 @@ namespace FacesApi.Models
         public Nullable<int> ExitCamera { get; set; }
         public bool IsDeduplicated { get; set; }
         public Nullable<int> VisitDurationInSeconds { get; set; }
+    
+        public virtual StoreTree Entrance_Camera { get; set; }
+        public virtual StoreTree Exit_Camera { get; set; }
     }
 }

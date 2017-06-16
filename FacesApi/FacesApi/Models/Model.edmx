@@ -4,7 +4,7 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-      <Schema Namespace="FacesModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+    <Schema Namespace="FacesModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <EntityType Name="__MigrationHistory">
           <Key>
             <PropertyRef Name="MigrationId" />
@@ -79,6 +79,30 @@ warning 6002: The table/view 'Faces.dbo.Configuration' does not have a primary k
           <Property Name="ExitTimestamp" Type="datetime" />
           <Property Name="Duration" Type="int" StoreGeneratedPattern="Computed" />
         </EntityType>
+        <Association Name="FK_EntranceCamera_ID">
+          <End Role="StoreTree" Type="Self.StoreTree" Multiplicity="1" />
+          <End Role="Faces" Type="Self.Faces" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="StoreTree">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="Faces">
+              <PropertyRef Name="EntranceCamera" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ExitCamera_ID">
+          <End Role="StoreTree" Type="Self.StoreTree" Multiplicity="0..1" />
+          <End Role="Faces" Type="Self.Faces" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="StoreTree">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="Faces">
+              <PropertyRef Name="ExitCamera" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <EntityContainer Name="FacesModelStoreContainer">
           <EntitySet Name="__MigrationHistory" EntityType="Self.__MigrationHistory" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Baskets" EntityType="Self.Baskets" Schema="dbo" store:Type="Tables" />
@@ -93,9 +117,16 @@ warning 6002: The table/view 'Faces.dbo.Configuration' does not have a primary k
     [Configuration].[UpdatedBy] AS [UpdatedBy]
     FROM [dbo].[Configuration] AS [Configuration]</DefiningQuery>
           </EntitySet>
+          <AssociationSet Name="FK_EntranceCamera_ID" Association="Self.FK_EntranceCamera_ID">
+            <End Role="StoreTree" EntitySet="StoreTree" />
+            <End Role="Faces" EntitySet="Faces" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ExitCamera_ID" Association="Self.FK_ExitCamera_ID">
+            <End Role="StoreTree" EntitySet="StoreTree" />
+            <End Role="Faces" EntitySet="Faces" />
+          </AssociationSet>
         </EntityContainer>
-      </Schema>
-    </edmx:StorageModels>
+      </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="FacesModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
@@ -136,6 +167,8 @@ warning 6002: The table/view 'Faces.dbo.Configuration' does not have a primary k
           <Property Name="ExitCamera" Type="Int32" />
           <Property Name="IsDeduplicated" Type="Boolean" Nullable="false" />
           <Property Name="VisitDurationInSeconds" Type="Int32" annotation:StoreGeneratedPattern="Computed" />
+          <NavigationProperty Name="Entrance_Camera" Relationship="FacesModel.FK_EntranceCamera_ID" FromRole="Face" ToRole="StoreTree" />
+          <NavigationProperty Name="Exit_Camera" Relationship="FacesModel.FK_ExitCamera_ID" FromRole="Face" ToRole="StoreTree" />
         </EntityType>
         <EntityType Name="StoreTree">
           <Key>
@@ -147,6 +180,8 @@ warning 6002: The table/view 'Faces.dbo.Configuration' does not have a primary k
           <Property Name="IsCamera" Type="Boolean" Nullable="false" />
           <Property Name="IsZone" Type="Boolean" Nullable="false" />
           <Property Name="FatherID" Type="Int32" />
+          <NavigationProperty Name="CameraInFaces" Relationship="FacesModel.FK_EntranceCamera_ID" FromRole="StoreTree" ToRole="Face" />
+          <NavigationProperty Name="CameraOutFaces" Relationship="FacesModel.FK_ExitCamera_ID" FromRole="StoreTree" ToRole="Face" />
         </EntityType>
         <EntityType Name="ZoneMonitoring">
           <Key>
@@ -178,7 +213,39 @@ warning 6002: The table/view 'Faces.dbo.Configuration' does not have a primary k
           <EntitySet Name="StoreTrees" EntityType="Self.StoreTree" />
           <EntitySet Name="ZoneMonitorings" EntityType="Self.ZoneMonitoring" />
           <EntitySet Name="Configurations" EntityType="Self.Configuration" />
+          <AssociationSet Name="FK_EntranceCamera_ID" Association="FacesModel.FK_EntranceCamera_ID">
+            <End Role="StoreTree" EntitySet="StoreTrees" />
+            <End Role="Face" EntitySet="Faces" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ExitCamera_ID" Association="FacesModel.FK_ExitCamera_ID">
+            <End Role="StoreTree" EntitySet="StoreTrees" />
+            <End Role="Face" EntitySet="Faces" />
+          </AssociationSet>
         </EntityContainer>
+        <Association Name="FK_EntranceCamera_ID">
+          <End Type="FacesModel.StoreTree" Role="StoreTree" Multiplicity="1" />
+          <End Type="FacesModel.Face" Role="Face" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="StoreTree">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="Face">
+              <PropertyRef Name="EntranceCamera" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ExitCamera_ID">
+          <End Type="FacesModel.StoreTree" Role="StoreTree" Multiplicity="0..1" />
+          <End Type="FacesModel.Face" Role="Face" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="StoreTree">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="Face">
+              <PropertyRef Name="ExitCamera" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
