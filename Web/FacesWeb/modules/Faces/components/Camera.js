@@ -5,6 +5,7 @@
         .component('camera', {
             templateUrl: 'modules/Faces/components/templates/Camera.html',            
             bindings: {
+                cameraName: '<',
                 todayRecordedFaces: '<',
                 totalRecordedFaces: '<'
             }

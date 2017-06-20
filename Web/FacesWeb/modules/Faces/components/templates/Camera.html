@@ -3,7 +3,15 @@
         <div class="col-sm-6">
             <i class="material-icons" style="font-size: 150px !important;">videocam</i>
         </div>
-        <div class="col-sm-6" style="padding-top: 5%;">            
+        <div class="col-sm-6" style="padding-top: 5%;">
+            <div class="row">
+                <div class="col-sm-4"><label>Name:</label></div>
+                <div class="col-sm-8">{{$ctrl.cameraName}}</div>
+            </div>
+            <div class="row">
+                <div class="col-sm-4"><label>Status:</label></div>
+                <div class="col-sm-8">Online</div>
+            </div>
             <div class="row">
                 <div class="col-sm-12"><label>Recorded Faces:</label></div>
             </div>
@@ -16,11 +24,7 @@
                 <div class="col-sm-1"></div>
                 <div class="col-sm-4"><label>Total</label></div>
                 <div class="col-sm-3">{{$ctrl.totalRecordedFaces}}</div>
-            </div>
-            <div class="row">
-                <div class="col-sm-4"><label>Status:</label></div>
-                <div class="col-sm-8">Online</div>
-            </div>
+            </div>            
         </div>
     </div>
 </div>

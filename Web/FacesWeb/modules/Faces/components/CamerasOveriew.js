@@ -33,6 +33,7 @@
                             var recordedFaces = camera["FacesIn@odata.count"] + camera["FacesOut@odata.count"]
                             $ctrl.cameraList.push({
                                 ID: camera.ID,
+                                Name: camera.Name,
                                 TotalRecordedFaces: recordedFaces,
                                 TodayRecordedFaces: 0
                             });
