@@ -24,7 +24,7 @@
         };
     }
 
-    function StoreTreeController($rootScope, $scope, $filter, StoreTreeService, WebApiService) {
+    function StoreTreeController($rootScope, $scope, $filter, StoreTreeService, OdataService) {
 
         var ctrl = this;
         var _context = {
@@ -270,7 +270,7 @@
 
             }, true)
 
-            WebApiService.getStoreTrees()
+            OdataService.getStoreTrees()
                 .then(function (response) {
                     if (response.status == 200) {
                         _storeList = $filter('filter')(response.data.value, { IsCamera: false });
@@ -288,7 +288,7 @@
 
     }
 
-    StoreTreeController.$inject = ['$rootScope', '$scope', '$filter', 'StoreTreeService', 'WebApiService'];
+    StoreTreeController.$inject = ['$rootScope', '$scope', '$filter', 'StoreTreeService', 'OdataService'];
 
 })();
 

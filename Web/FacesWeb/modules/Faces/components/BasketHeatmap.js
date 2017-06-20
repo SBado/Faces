@@ -13,7 +13,7 @@
             }
         });    
 
-    function BasketHeatmapController($scope, StoreTreeService, WebApiService) {
+    function BasketHeatmapController($scope, StoreTreeService, OdataService) {
         var ctrl = this;
         var _watch = null;          
 

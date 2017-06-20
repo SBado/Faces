@@ -15,7 +15,7 @@
         };
     }
 
-    function StoreOverviewController($scope, $filter, $http, StoreTreeService, WebApiService) {
+    function StoreOverviewController($scope, $filter, $http, StoreTreeService, OdataService) {
         var vm = this;
         var _treeLoadedEvent = null;
         var _watches = [];
@@ -147,7 +147,7 @@
                 return;
             }
 
-            WebApiService.getFacesInStore(new Date()).then(function (response) {
+            OdataService.getFacesInStore(new Date()).then(function (response) {
                 if (response.status == 200 && response.data.value.length) {
                     _faces = response.data.value;
 
@@ -184,6 +184,6 @@
         init();        
     }
 
-    StoreOverviewController.$inject = ['$scope', '$filter', '$http', 'StoreTreeService', 'WebApiService'];
+    StoreOverviewController.$inject = ['$scope', '$filter', '$http', 'StoreTreeService', 'OdataService'];
 
 })();

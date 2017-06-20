@@ -15,7 +15,7 @@
         };
     }
 
-    function BasketsOverviewController($scope, StoreTreeService, WebApiService) {
+    function BasketsOverviewController($scope, StoreTreeService, OdataService) {
         var vm = this;
         var max = 100;
         var dataPoints = [];
@@ -103,7 +103,7 @@
                 });
             }
 
-            WebApiService.getBasketsInStore().then(function (response) {
+            OdataService.getBasketsInStore().then(function (response) {
                 if (response.status == 200 && response.data.value.length) {
                 }
             });
@@ -181,7 +181,7 @@
         //        });
         //    }
 
-        //    WebApiService.getBasketsInStore().then(function (response) {
+        //    OdataService.getBasketsInStore().then(function (response) {
         //        if (response.status == 200 && response.data.value.length) {
         //        }
         //    });
@@ -196,6 +196,6 @@
         init();       
     }
 
-    BasketsOverviewController.$inject = ['$scope', 'StoreTreeService', 'WebApiService'];
+    BasketsOverviewController.$inject = ['$scope', 'StoreTreeService', 'OdataService'];
 
 })();

@@ -7,7 +7,7 @@
             controller: BasketsOverviewController
         });
 
-    function BasketsOverviewController($filter, StoreTreeService, WebApiService) {
+    function BasketsOverviewController($filter, StoreTreeService, OdataService) {
         var $ctrl = this;
         var _subscription = null;
         var _imagesBasePath = 'modules/Faces/images/stores';
@@ -30,7 +30,7 @@
                 return;
             }
 
-            WebApiService.getBasketsInStore(context.zones).then(function (response) {
+            OdataService.getBasketsInStore(context.zones).then(function (response) {
                 if (response.status == 200 && response.data.value.length) {                   
                     var zones = $filter('groupBy')(response.data.value, 'CurrentZone');
                     var dataPoints = [];
@@ -73,7 +73,7 @@
                         else {
                             zones = StoreTreeService.getApi().getCompanyZones(context.store);
                         }
-                        WebApiService.getBasketsInStoreCount(zones).then(function (res) {
+                        OdataService.getBasketsInStoreCount(zones).then(function (res) {
                             if (res.status == 200) {
                                 if (context.store.IsZone) {
                                     var company = context.company.Name.formatStoreName();
@@ -211,7 +211,7 @@
         //        });
         //    }
 
-        //    WebApiService.getBasketsInStore().then(function (response) {
+        //    OdataService.getBasketsInStore().then(function (response) {
         //        if (response.status == 200 && response.data.value.length) {
         //        }
         //    });

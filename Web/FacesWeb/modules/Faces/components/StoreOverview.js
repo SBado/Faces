@@ -7,7 +7,7 @@
             controller: StoreOverviewController
         });
 
-    function StoreOverviewController($scope, $filter, $http, StoreTreeService, WebApiService) {
+    function StoreOverviewController($scope, $filter, $http, StoreTreeService, OdataService) {
         var $ctrl = this;        
         var _subscription = null;
         var _locations = {};
@@ -141,7 +141,7 @@
                 return;
             }
 
-            WebApiService.getFacesInStore(new Date(), context.cameras).then(function (response) {
+            OdataService.getFacesInStore(new Date(), context.cameras).then(function (response) {
                 if (response.status == 200 && response.data.value.length) {
                     _faces = response.data.value;
 
