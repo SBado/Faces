@@ -223,7 +223,7 @@
 
         function getCompanyZones(company) {
             if (!_zones[company.ID]) {
-                _zones[company.ID] = getStoreZones(_zoneList, getStoreBranch(vm.treeData, company));
+                _zones[company.ID] = getStoreZones(_zoneList, getStoreBranch(ctrl.treeData, company));
             }
 
             return angular.copy(_zones[company.ID]);
@@ -231,7 +231,7 @@
 
         function getBuildingZones(building) {
             if (!_zones[building.ID]) {
-                _zones[building.ID] = getStoreZones(_zoneList, getStoreBranch(vm.treeData, building));
+                _zones[building.ID] = getStoreZones(_zoneList, getStoreBranch(ctrl.treeData, building));
             }
 
             return angular.copy(_zones[building.ID]);

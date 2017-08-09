@@ -28,7 +28,7 @@
             <md-subheader class="md-no-sticky">Navigate</md-subheader>
             <md-list-item>
                 <i class="material-icons" style="margin-right:10px;">tv</i>
-                <p ng-click="::vm.goTo('home.overview')">Overview</p>
+                <p ng-click="::vm.goTo('home.overview')">Main Overview</p>
             </md-list-item>
             <md-list-item>
                 <i class="material-icons" style="margin-right:10px;">local_grocery_store</i>
@@ -37,6 +37,10 @@
             <md-list-item>
                 <i class="material-icons" style="margin-right:10px;">videocam</i>
                 <p ng-click="::vm.goTo('home.cameras')">Cameras Overview</p>
+            </md-list-item>
+            <md-list-item>
+                <i class="material-icons" style="margin-right:10px;">assessment</i>
+                <p ng-click="::vm.goTo('home.graphs')">Graphs</p>
             </md-list-item>
             <md-divider></md-divider>
             <md-subheader class="md-no-sticky">Tools</md-subheader>            
@@ -84,6 +88,9 @@
                 </div>
                 &emsp;
                 <store-breadcrumbs style="margin-top:5px;"></store-breadcrumbs>
+            </div>
+            <div class="content-overlay flexbox-row" ng-show="loadingContent">
+                <md-progress-circular md-mode="indeterminate"></md-progress-circular>
             </div>
             <md-content ui-view="pages" style="height: calc(100vh - 148px); padding-top:5px;"></md-content>
         </div>

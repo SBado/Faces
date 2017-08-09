@@ -15,7 +15,7 @@
         };
     }
 
-    function MainViewController($rootScope, $scope, $mdSidenav, $state, $transitions, $uibModal, $timeout, AuthenticationService, UserService) {
+    function MainViewController($rootScope, $scope, $mdSidenav, $state, $transition, $uibModal, $timeout, AuthenticationService, UserService) {
 
         var vm = this;
         var _eventHandlers = [];

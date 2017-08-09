@@ -1,21 +1,34 @@
 ﻿<!DOCTYPE html>
 <html ng-app="faces">
 <head>
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-    <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>    
-    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
-    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular-route.min.js"></script>
-    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular-animate.min.js"></script>
-    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular-aria.min.js"></script>
-    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular-messages.min.js"></script>
-    <script src="//ajax.googleapis.com/ajax/libs/angular_material/1.1.4/angular-material.min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.4/angular-resource.js"></script>        
+    <!--<script src="//ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>-->
+    <script src="scripts/jquery-3.1.1.min.js"></script>
+    <!--<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>-->
+    <script src="scripts/jquery-ui-1.12.1.js"></script>
+    <!--<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>-->
+    <script src="scripts/angular.min.js"></script>
+    <!--<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular-route.min.js"></script>-->
+    <script src="scripts/angular-route.min.js"></script>
+    <!--<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular-animate.min.js"></script>-->
+    <script src="scripts/angular-animate.min.js"></script>
+    <!--<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular-aria.min.js"></script>-->
+    <script src="scripts/angular-aria.min.js"></script>
+    <!--<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular-messages.min.js"></script>-->
+    <script src="scripts/angular-messages.min.js"></script>
+    <!--<script src="//ajax.googleapis.com/ajax/libs/angular_material/1.1.4/angular-material.min.js"></script>-->
+    <script src="scripts/angular-material.min.js"></script>
+    <!--<script src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.4/angular-resource.js"></script>-->
+    <script src="scripts/angular-resource.js"></script>
     <!--<scritp src="//cdnjs.cloudflare.com/ajax/libs/angular-filter/0.5.16/angular-filter.min.js"></scritp>-->
     <script src="scripts/angular-filter.min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
-    <script src="//cdn.jsdelivr.net/angular.chartjs/latest/angular-chart.min.js"></script>
-    <script src="//unpkg.com/bootstrap/dist/js/bootstrap.min.js"></script>
+    <!--<script src="//cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>-->
+    <script src="scripts/Chart.min.js"></script>
+    <!--<script src="//cdn.jsdelivr.net/angular.chartjs/latest/angular-chart.min.js"></script>-->
+    <script src="scripts/angular-chart.min.js"></script>
+    <!--<script src="//unpkg.com/bootstrap/dist/js/bootstrap.min.js"></script>-->
+    <script src="scripts/bootstrap.min.js"></script>
     <script src="//unpkg.com/angular-ui-router/release/angular-ui-router.min.js"></script>
+    <!--<script src="scripts/angular-ui-router.min.js"></script>-->
     <script src="//unpkg.com/rx/dist/rx.all.js"></script>
     <script src="//unpkg.com/rx-angular/dist/rx.angular.js"></script>
     <script src="//rawgit.com/Templarian/ui.bootstrap.contextMenu/master/contextMenu.js"></script>
@@ -30,7 +43,10 @@
     <!--<script src="//rawgit.com/pa7/heatmap.js/master/plugins/svg-area-heatmap.js"></script>-->
     <script src="scripts/svg-area-heatmap.js"></script>
     <!--<script src="//rawgit.com/pa7/heatmap.js/master/plugins/angular-heatmap/angular-heatmap.js"></script>-->
-
+    <script src="scripts/moment.min.js"></script>
+    <script src="scripts/moment-with-locales.min.js"></script>    
+    <script src="scripts/moment-precise-range.js"></script>
+    <script src="scripts/angular-moment.min.js"></script>
     <script src="scripts/angular-heatmap.js"></script>
     <script src="scripts/Chart.PieceLabel.js"></script>
     <script src="scripts/ui-bootstrap-custom-tpls-1.3.2.js"></script>
@@ -55,15 +71,22 @@
     <script src="modules/Faces/components/StoreBreadcrumbs.js"></script>
     <script src="modules/Faces/components/StoreOverview.js"></script>
     <script src="modules/Faces/components/BasketHeatmap.js"></script>
-    <script src="modules/Faces/components/BasketsOverview.js"></script>    
+    <script src="modules/Faces/components/BasketsOverview.js"></script>
     <script src="modules/Faces/components/Camera.js"></script>
     <script src="modules/Faces/components/CamerasOveriew.js"></script>
+    <script src="modules/Faces/components/Graphs.js"></script>
     <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
-    <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/angular_material/1.1.4/angular-material.min.css">
-    <link rel="stylesheet" href="//unpkg.com/bootstrap/dist/css/bootstrap.min.css">    
+    <!--<link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/angular_material/1.1.4/angular-material.min.css">-->
+    <link href="Content/angular-material.min.css" rel="stylesheet" />    
+    <link href="Content/angular-material.layout-attributes.min.css" rel="stylesheet" />
+    <link href="Content/angular-material.layouts.min.css" rel="stylesheet" />
+    <link href="Content/angular-material.layouts.ie_fixes.css" rel="stylesheet" />
+    <!--<link rel="stylesheet" href="//unpkg.com/bootstrap/dist/css/bootstrap.min.css">-->
+    <link href="Content/bootstrap.min.css" rel="stylesheet" />
+    <link href="Content/bootstrap-theme.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="styles/style.css">
-    <link href="styles/abn_tree.css" rel="stylesheet" />          
+    <link href="styles/abn_tree.css" rel="stylesheet" />
 </head>
 <body ng-controller="ParentController">
     <div class="noselect" ui-view="main-view"></div>

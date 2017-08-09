@@ -1,0 +1,26 @@
+﻿<div class="container-fluid">
+    <div class="row">
+        <div class="col-xs-2">
+            <div class="flexbox-column-left" style="margin-top:25%;"> 
+                <label> Caratteristica: </label>
+                <md-select ng-model="$ctrl.selectedCharacteristic" ng-change="$ctrl.reload()">                    
+                    <md-option ng-repeat="c in $ctrl.characteristics" ng-value="c">{{ c.name }}</md-option>
+                </md-select>
+            </div>
+        </div>
+        <div class="col-xs-8">
+            <canvas id="barChart" class="chart chart-bar"
+                    chart-data="$ctrl.data" chart-labels="$ctrl.labels"
+                    chart-series="$ctrl.series" chart-options="$ctrl.options"></canvas>
+        </div>
+        <div class="col-xs-2">
+            <div class="flexbox-column-left" style="margin-top:25%;">
+                <label>Da:</label>
+                <md-datepicker ng-model="$ctrl.startDate" ng-change="$ctrl.reload()"></md-datepicker>
+                <br/>
+                <label>A:</label>
+                <md-datepicker ng-model="$ctrl.endDate" ng-change="$ctrl.reload()"></md-datepicker>
+            </div>
+        </div>
+    </div>
+</div>

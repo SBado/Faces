@@ -29,27 +29,65 @@
             return getAll('StoreTrees', options);
         }
 
-        self.getFaces = function (options) {
+        self.getAllFaces = function (options) {
             return getAll('Faces', options);
         }
 
-        self.getFacesInStore = function (date, cameras) {
-            var dateFilter = 'year(EntranceTimestamp) eq ' + date.getFullYear() +
-                ' and month(EntranceTimestamp) eq ' + (date.getMonth() + 1) +
-                ' and day(EntranceTimestamp) eq ' + date.getDate();
-
-            var cameraFilter = '';
-            cameras.map(camera => cameraFilter += 'EntranceCamera eq ' + camera.ID + ' or ');
-
-            if (cameraFilter) {
-                cameraFilter = cameraFilter.slice(0, -4);
-                cameraFilter = " and (" + cameraFilter + ")";
-
-                return self.getFaces('$filter=ExitTimestamp eq null and ' + dateFilter + ' ' + cameraFilter);
-            }
-            else {
+        self.getFaces = function (inDate, cameras, outDate, isDateRange, groupByList, aggregate, selectList) {
+            if (outDate && outDate < inDate) {
                 return createEmptyResponse();
             }
+            
+            var cameraFilter = '';
+            cameras.map(camera => cameraFilter += 'EntranceCamera eq ' + camera.ID + ' or ');
+            if (!cameraFilter) {
+                return createEmptyResponse();
+            }
+            cameraFilter = cameraFilter.slice(0, -4);
+            cameraFilter = " and (" + cameraFilter + ")";
+
+            var comparator = isDateRange ? ' ge ' : ' eq ';
+            var dateFilter = 'year(EntranceTimestamp)' + comparator + inDate.getFullYear() +
+                ' and month(EntranceTimestamp)' + comparator  + (inDate.getMonth() + 1) +
+                ' and day(EntranceTimestamp)' + comparator  + inDate.getDate();
+
+            if (outDate) {
+                comparator = isDateRange ? ' le ' : ' eq '
+                dateFilter += ' and year(ExitTimestamp)' + comparator + outDate.getFullYear() +
+                    ' and month(ExitTimestamp)' + comparator + (outDate.getMonth() + 1) +
+                    ' and day(ExitTimestamp)' + comparator + outDate.getDate();
+            }
+
+            var select = '';
+            if (selectList) {
+                select = '&$select=' + selectList.join(',');
+            }
+
+            if (outDate) {
+                if (groupByList && aggregate) {
+                    return self.getAllFaces('$apply=filter(' + dateFilter + ' ' + cameraFilter +
+                        ')/groupby((' + groupByList.join(',') +
+                        '),aggregate(' + aggregate.property +
+                        ' with ' + aggregate.transformation +
+                        ' as ' + aggregate.alias + '))');
+                }
+                return self.getAllFaces('$filter=' + dateFilter + ' ' + cameraFilter + select);
+            }
+            else {
+                if (groupByList && aggregate) {
+                    return self.getAllFaces('$apply=filter(ExitTimestamp eq null and ' + dateFilter + ' ' + cameraFilter +
+                        ')/groupby((' + groupByList.join(',') +
+                        '),aggregate(' + aggregate.property +
+                        ' with ' + aggregate.transformation +
+                        ' as ' + aggregate.alias + '))');
+                }
+                return self.getAllFaces('$filter=ExitTimestamp eq null and ' + dateFilter + ' ' + cameraFilter + select);
+            }
+
+        }
+
+        self.getFacesInStore = function (inDate, cameras, outDate) {
+            return self.getFaces(inDate, cameras);
         }
 
         self.getBaskets = function (options) {
