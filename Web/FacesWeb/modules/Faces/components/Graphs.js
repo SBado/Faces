@@ -7,7 +7,7 @@
             controller: GraphsController
         });
 
-    function GraphsController($rootScope, $http, $filter, $q, StoreTreeService, OdataService, moment) {
+    function GraphsController($rootScope, $http, $filter, $q, StoreTreeService, OdataService, ChartService, UtilityService, moment) {
 
         var $ctrl = this;
         var _subscription = null;
@@ -31,14 +31,26 @@
 
         function init() {
             $ctrl.cameraList = [];
+            $ctrl.options = {
+                title: {
+                    display: true,
+                    text: ''
+                },
+                legend: {
+                    display: true,
+                    position: 'bottom'
+                },
+                responsive: true,
+                maintainAspectRatio: true
+            }
             $ctrl.labels = [];
             $ctrl.data = [];
             $ctrl.characteristics = [
-                { name: 'Sesso', labels: ['Donne', 'Uomini'], possibleValues: ['F', 'M'], id: 'Gender', canGroup: true },
-                { name: 'Età', labels: ['0-12', '13-19', '20-60', '60+'], id: 'Age', canGroup: false },
-                { name: 'Occhiali', labels: ['Con occhiali', 'Senza occhiali'], possibleValues: [true, false], id: 'Eyeglasses', canGroup: true },
-                { name: 'Baffi', labels: ['Con baffi', 'Senza baffi'], id: 'Mustaches', canGroup: false },
-                { name: 'Barba', labels: ['Con barba', 'Senza barba'], id: 'Beard', canGroup: false }
+                { id: 'Gender', name: 'Sesso', labels: ['Donne', 'Uomini'], possibleValues: ['F', 'M'], canGroup: true },
+                { id: 'Age', name: 'Età', labels: ['0-12', '13-19', '20-60', '60+'], possibleValues: [{ values: [0, 12], operators: '<,<=' }, { values: [12, 19], operators: '<,<=' }, { values: [19, 60], operators: '<,<=' }, { values: [60], operators: '>' }], canGroup: false },
+                { id: 'Eyeglasses', name: 'Occhiali', labels: ['Con occhiali', 'Senza occhiali'], possibleValues: [true, false], canGroup: true },
+                { id: 'Mustaches', name: 'Baffi', labels: ['Con baffi', 'Senza baffi'], possibleValues: [{ values: [0], operators: '==' }, { values: [0, 1], operators: '<,<=' }], canGroup: false },
+                { id: 'Beard', name: 'Barba', labels: ['Con barba', 'Senza barba'], possibleValues: [{ values: [0], operators: '==' }, { values: [0, 1], operators: '<,<=' }], canGroup: false }
             ]
             $ctrl.selectedCharacteristic = $ctrl.characteristics[0];
 
@@ -56,68 +68,20 @@
 
         function reload() {
 
-            if (!$ctrl.selectedCharacteristic.canGroup) {
-                //return;
-            }
-
             $rootScope.loadingContent = true;
 
             $ctrl.labels.length = 0;
             $ctrl.data.length = 0;
 
-            var diff = moment.preciseDiff($ctrl.startDate, $ctrl.endDate, true)
-            var firstMonth = $ctrl.startDate.getMonth();
-            var firstYear = $ctrl.startDate.getFullYear();
-            var numberOfMonths = diff.months;
-            if (diff.seconds || diff.minutes || diff.hours || diff.days) {
-                numberOfMonths++;
-            }
+            $ctrl.labels = ChartService.getMonthLabels($ctrl.startDate, $ctrl.endDate);
+            var dateFilters = ChartService.getMonthFilters($ctrl.startDate, $ctrl.endDate);
+            var numberOfMonths = ChartService.getNumberOfMonths($ctrl.startDate, $ctrl.endDate);
 
-            var dateFilters = [];
-            var loopNumber = 0;
-            var lastMonth = firstMonth;
-            var year = firstYear;
-            for (var i = firstMonth; i < 13; i = (i + 1) % 12) {
-                $ctrl.labels.push(months[i] + ' ' + year);
-                if (lastMonth > i) {
-                    year++;
-                }
-                dateFilters.push(
-                    {
-                        index: loopNumber,
-                        year: year,
-                        month: i,
-                        days: days[i]
-                    }
-                )
-                loopNumber++;
-                if (loopNumber == numberOfMonths) {
-                    break;
-                }
-
-                lastMonth = i;
-            }
-
-            //$ctrl.labels = ['Gen', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'];
             $ctrl.series = $ctrl.selectedCharacteristic.labels;
 
-            $ctrl.data = [
-                new Array(numberOfMonths),
-                new Array(numberOfMonths)
-            ];
-
-            $ctrl.options = {
-                title: {
-                    display: true,
-                    text: ''
-                },
-                legend: {
-                    display: true,
-                    position: 'bottom'
-                },
-                responsive: true,
-                maintainAspectRatio: true
-            }
+            $ctrl.series.map(function () {
+                $ctrl.data.push(new Array(numberOfMonths));
+            })
 
             var context = StoreTreeService.getContext();
 
@@ -126,35 +90,89 @@
                 return;
             }
 
-            dateFilters.map(d => {
-                var xIndex = d.index;
-                OdataService.getFaces(new Date(d.year, d.month, 1),
-                    context.cameras,
-                    new Date(d.year, d.month, d.days),
-                    true,
-                    [$ctrl.selectedCharacteristic.id],
-                    { property: 'ID', transformation: 'countdistinct', alias: 'total' }
-                ).then(function (response) {
-                    $rootScope.loadingContent = false;
-                    if (response.status == 200 && response.data.value.length) {
-                        for (var i = 0; i < $ctrl.selectedCharacteristic.labels.length; i++) {
-                            var total = $filter('filter')(response.data.value, function (val) {
-                                if (val[$ctrl.selectedCharacteristic.id] == $ctrl.selectedCharacteristic.possibleValues[i]) {
-                                    return true;
-                                }
-                                else {
-                                    return false;
-                                }
-                            })[0].total;
-                            $ctrl.data[i][xIndex] = total;
+            if ($ctrl.selectedCharacteristic.canGroup) {
+                dateFilters.map(d => {
+                    var xIndex = d.index;
+                    OdataService.getFaces(new Date(d.year, d.month, 1),
+                        context.cameras,
+                        new Date(d.year, d.month, d.days),
+                        true,
+                        null,
+                        [$ctrl.selectedCharacteristic.id],
+                        { property: 'ID', transformation: 'countdistinct', alias: 'total' }
+                    ).then(function (response) {
+                        $rootScope.loadingContent = false;
+                        if (response.status == 200 && response.data.value.length) {
+                            //for (var i = 0; i < $ctrl.selectedCharacteristic.labels.length; i++) {
+                            //    var total = $filter('filter')(response.data.value, function (val) {
+                            //        if (val[$ctrl.selectedCharacteristic.id] == $ctrl.selectedCharacteristic.possibleValues[i]) {
+                            //            return true;
+                            //        }
+                            //        else {
+                            //            return false;
+                            //        }
+                            //    })[0].total;
+                            //    $ctrl.data[i][xIndex] = total;
+                            //}
+                            var counts = ChartService.getCharacteristicGroupsCount($ctrl.selectedCharacteristic, response.data.value);
+                            for (var i = 0; i < counts.length; i++) {
+                                $ctrl.data[i][xIndex] = counts[i];
+                            }
                         }
-                        //$ctrl.data[1][xIndex] = response.data.value[1].total;
-                    }
-                    else {
-                        //setChartsEmpty($ctrl.charts);
-                    }
-                }, function (error) { $rootScope.loadingContent = false; })
-            });
+                        else {
+                            //setChartsEmpty($ctrl.charts);
+                        }
+                    }, function (error) { $rootScope.loadingContent = false; })
+                });
+            }
+            else {
+                dateFilters.map(d => {
+                    var xIndex = d.index;
+                    OdataService.getFaces(new Date(d.year, d.month, 1),
+                        context.cameras,
+                        new Date(d.year, d.month, d.days),
+                        true,
+                        null, null, null,
+                        [$ctrl.selectedCharacteristic.id]
+                    ).then(function (response) {
+                        $rootScope.loadingContent = false;
+                        if (response.status == 200 && response.data.value.length) {
+                            //for (var i = 0; i < $ctrl.selectedCharacteristic.labels.length; i++) {
+                            //    var filteredValues = $filter('filter')(response.data.value, function (val) {
+                            //        var values = $ctrl.selectedCharacteristic.possibleValues[i].values;
+                            //        var op = $ctrl.selectedCharacteristic.possibleValues[i].operators;
+
+                            //        if (values.length == 1) {
+                            //            if (UtilityService.operators[op](val[$ctrl.selectedCharacteristic.id], values[0])) {
+                            //                return true;
+                            //            }
+                            //            else {
+                            //                return false;
+                            //            }
+                            //        }
+                            //        else {
+                            //            if (UtilityService.operators[op](val[$ctrl.selectedCharacteristic.id], values[0], values[1])) {
+                            //                return true;
+                            //            }
+                            //            else {
+                            //                return false;
+                            //            }
+                            //        }
+                            //    });
+                            //    $ctrl.data[i][xIndex] = filteredValues.length;
+                            //}
+                            
+                            var counts = ChartService.getCharacteristicCount($ctrl.selectedCharacteristic, response.data.value);
+                            for (var i = 0; i < counts.length; i++) {
+                                $ctrl.data[i][xIndex] = counts[i];
+                            }
+                        }
+                        else {
+                            //setChartsEmpty($ctrl.charts);
+                        }
+                    }, function (error) { $rootScope.loadingContent = false; })
+                });
+            }
         }
 
         function clean() {

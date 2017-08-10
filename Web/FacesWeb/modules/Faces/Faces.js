@@ -4,7 +4,7 @@
     app.config(['$stateProvider', '$urlRouterProvider', '$mdDateLocaleProvider', function ($stateProvider, $urlRouterProvider, $mdDateLocaleProvider) {
 
         // For any unmatched url, redirect to /state1
-        $urlRouterProvider.otherwise("/home/aaa");
+        $urlRouterProvider.otherwise("/home/overview");
 
         $stateProvider
             .state('home.overview', {
@@ -21,7 +21,7 @@
             .state('home.baskets', {
                 url: "/baskets",
                 data: {
-                    pageTitle: 'Baskets Overview'
+                    pageTitle: 'Carrelli'
                 },
                 views: {
                     'pages': {
@@ -32,7 +32,7 @@
             .state('home.cameras', {
                 url: "/cameras",
                 data: {
-                    pageTitle: 'Cameras Overview'
+                    pageTitle: 'Videocamere'
                 },
                 views: {
                     'pages': {
@@ -43,7 +43,7 @@
             .state('home.graphs', {
                 url: "/graphs",
                 data: {
-                    pageTitle: 'Graphs'
+                    pageTitle: 'Grafici'
                 },
                 views: {
                     'pages': {

@@ -87,21 +87,48 @@
             }
         }
 
-        function greaterThanPredicate(prop, val) {
+        function greaterThanPredicate(prop, val, equal) {
+            if (equal) {
+                return function (item) {
+                    return item[prop] >= val;
+                }
+            }
             return function (item) {
                 return item[prop] > val;
             }
         }
 
-        function lessThanPredicate(prop, val) {
+        function lessThanPredicate(prop, val, equal) {
+            if (equal) {
+                return function (item) {
+                    return item[prop] <= val;
+                }
+            }
             return function (item) {
                 return item[prop] < val;
             }
         }
 
-        function betweenPredicate(prop, minVal, maxVal) {
-            return function (item) {
-                return minVal <= item[prop] <= maxVal;
+        function betweenPredicate(prop, minVal, maxVal, minEqual, maxEqual) {
+            if (minEqual && !maxEqual) {
+                return function (item) {
+                    return minVal <= item[prop] < maxVal;
+                }
+            }
+            else if (!minEqual && maxEqual) {
+                return function (item) {
+                    return minVal < item[prop] <= maxVal;
+                }
+            }
+            else if (minEqual && maxEqual) {
+                return function (item) {
+                    return minVal <= item[prop] <= maxVal;
+                }
+            }
+            else {
+                return function (item) {
+                    return minVal < item[prop] < maxVal;
+                }
             }
         }
 
@@ -161,9 +188,9 @@
                     var mustaches = $filter('filter')(_faces, greaterThanPredicate('Mustaches', 0)).length;
                     var nothing = _faces.length > (beard + mustaches) ? _faces.length - (beard + mustaches) : 0;                    
 
-                    var children = $filter('filter')(_faces, lessThanPredicate('Age', 13)).length;
-                    var teens = $filter('filter')(_faces, betweenPredicate('Age', 13, 19)).length;
-                    var adults = $filter('filter')(_faces, betweenPredicate('Age', 20, 60)).length;
+                    var children = $filter('filter')(_faces, lessThanPredicate('Age', 12, true)).length;
+                    var teens = $filter('filter')(_faces, betweenPredicate('Age', 12, 19, false, true)).length;
+                    var adults = $filter('filter')(_faces, betweenPredicate('Age', 19, 60, false, true)).length;
                     var elders = $filter('filter')(_faces, greaterThanPredicate('Age', 60)).length;
 
                     setChartValues($ctrl.charts.Sex, [males, females]);

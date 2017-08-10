@@ -17,7 +17,7 @@
             </h2>
             <span flex></span>
             <md-button class="md-icon-button" aria-label="Close Side Panel" ng-click="vm.closeMenuPanel()">
-                <md-tooltip md-autohide="true">Close Menu</md-tooltip>
+                <md-tooltip md-autohide="true">Chiudi Menu</md-tooltip>
                 <i class="material-icons">close</i>
             </md-button>
         </div>
@@ -25,25 +25,25 @@
     <md-content layout-padding="">
         <md-list>
             <md-divider></md-divider>
-            <md-subheader class="md-no-sticky">Navigate</md-subheader>
+            <md-subheader class="md-no-sticky">Navigazione</md-subheader>
             <md-list-item>
                 <i class="material-icons" style="margin-right:10px;">tv</i>
-                <p ng-click="::vm.goTo('home.overview')">Main Overview</p>
+                <p ng-click="::vm.goTo('home.overview')">Overview</p>
             </md-list-item>
             <md-list-item>
                 <i class="material-icons" style="margin-right:10px;">local_grocery_store</i>
-                <p ng-click="::vm.goTo('home.baskets')">Baskets Overview</p>
+                <p ng-click="::vm.goTo('home.baskets')">Carrelli</p>
             </md-list-item>
             <md-list-item>
                 <i class="material-icons" style="margin-right:10px;">videocam</i>
-                <p ng-click="::vm.goTo('home.cameras')">Cameras Overview</p>
+                <p ng-click="::vm.goTo('home.cameras')">Videocamere</p>
             </md-list-item>
             <md-list-item>
                 <i class="material-icons" style="margin-right:10px;">assessment</i>
-                <p ng-click="::vm.goTo('home.graphs')">Graphs</p>
+                <p ng-click="::vm.goTo('home.graphs')">Grafici</p>
             </md-list-item>
             <md-divider></md-divider>
-            <md-subheader class="md-no-sticky">Tools</md-subheader>            
+            <md-subheader class="md-no-sticky">Strumenti</md-subheader>            
             <md-list-item>
                 <i class="material-icons" style="margin-right:10px;">exit_to_app</i>
                 <p ng-click="::vm.logOut()">Logout</p>
@@ -69,7 +69,7 @@
                     </h2>
                     <span flex></span>
                     <md-button class="md-icon-button" aria-label="Close Side Panel" ng-click="vm.closeTreePanel()">
-                        <md-tooltip md-autohide="true">Hide Tree</md-tooltip>
+                        <md-tooltip md-autohide="true">Nascondi albero</md-tooltip>
                         <i class="material-icons">close</i>
                     </md-button>
                 </div>
@@ -82,7 +82,7 @@
             <div class="subheader">
                 <div style="width:52px; " class="squeeze-show" ng-show="!vm.isTreeOpen"">
                     <md-button style="margin-top:5px;" class="md-icon-button" ng-click="vm.openTreePanel()">
-                        <md-tooltip md-autohide="true">Open Store Tree</md-tooltip>
+                        <md-tooltip md-autohide="true">Apri albero</md-tooltip>
                         <i class="material-icons">store</i>
                     </md-button>
                 </div>
