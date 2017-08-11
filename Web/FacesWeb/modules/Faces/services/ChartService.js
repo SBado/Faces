@@ -56,6 +56,30 @@
                 days: days[month]
             })
         }
+
+        var compareCharacteristicPredicate = function (characteristic, index) {
+            return function (value) {
+                var values = characteristic.possibleValues[index].values;
+                var op = characteristic.possibleValues[index].operators;
+
+                if (values.length == 1) {
+                    if (UtilityService.operators[op](value[characteristic.id], values[0])) {
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
+                }
+                else {
+                    if (UtilityService.operators[op](value[characteristic.id], values[0], values[1])) {
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
+                }
+            }
+        }
         
         self.getNumberOfMonths = function (startDate, endDate) {
             var startMonth = startDate.getMonth();
@@ -73,7 +97,7 @@
             }
             else {
                 var diff = endYear - startYear;
-                return endMonth + (11 - startMonth + 1 + (diff - 1) * 11) + 1;
+                return endMonth + (11 - startMonth + 1 + (diff - 1) * 12) + 1;
             }
                         
         }
@@ -93,14 +117,7 @@
         self.getCharacteristicGroupsCount = function (characteristic, values) {
             var counts = [];
             for (var i = 0; i < characteristic.labels.length; i++) {
-                var total = $filter('filter')(values, function (val) {
-                    if (val[characteristic.id] == characteristic.possibleValues[i]) {
-                        return true;
-                    }
-                    else {
-                        return false;
-                    }
-                })[0].total;
+                var total = $filter('filter')(values, compareCharacteristicPredicate(characteristic, i))[0].total;
                 counts.push(total);
             }
 
@@ -110,29 +127,19 @@
         self.getCharacteristicCount = function (characteristic, values) {
             var counts = [];
             for (var i = 0; i < characteristic.labels.length; i++) {
-                var filteredValues = $filter('filter')(values, function (val) {
-                    var values = characteristic.possibleValues[i].values;
-                    var op = characteristic.possibleValues[i].operators;
-
-                    if (values.length == 1) {
-                        if (UtilityService.operators[op](val[characteristic.id], values[0])) {
-                            return true;
-                        }
-                        else {
-                            return false;
-                        }
-                    }
-                    else {
-                        if (UtilityService.operators[op](val[characteristic.id], values[0], values[1])) {
-                            return true;
-                        }
-                        else {
-                            return false;
-                        }
-                    }
-                });
+                var filteredValues = $filter('filter')(values, compareCharacteristicPredicate(characteristic, i));
                 counts.push(filteredValues.length);
             }
+
+            return counts;
+        }
+
+        self.getCharacteristicListCount = function (characteristicList, values) {
+            var counts = [];
+            characteristicList.map(c => {
+                counts.push.apply(counts, self.getCharacteristicCount(c, values));
+            });
+            
 
             return counts;
         }

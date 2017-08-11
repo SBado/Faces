@@ -7,7 +7,7 @@
             controller: StoreOverviewController
         });
 
-    function StoreOverviewController($scope, $filter, $http, StoreTreeService, OdataService) {
+    function StoreOverviewController($scope, $filter, StoreTreeService, OdataService, UtilityService) {
         var $ctrl = this;        
         var _subscription = null;
         var _locations = {};
@@ -85,52 +85,7 @@
             if (StoreTreeService.getContext()) {
                 reload();
             }
-        }
-
-        function greaterThanPredicate(prop, val, equal) {
-            if (equal) {
-                return function (item) {
-                    return item[prop] >= val;
-                }
-            }
-            return function (item) {
-                return item[prop] > val;
-            }
-        }
-
-        function lessThanPredicate(prop, val, equal) {
-            if (equal) {
-                return function (item) {
-                    return item[prop] <= val;
-                }
-            }
-            return function (item) {
-                return item[prop] < val;
-            }
-        }
-
-        function betweenPredicate(prop, minVal, maxVal, minEqual, maxEqual) {
-            if (minEqual && !maxEqual) {
-                return function (item) {
-                    return minVal <= item[prop] < maxVal;
-                }
-            }
-            else if (!minEqual && maxEqual) {
-                return function (item) {
-                    return minVal < item[prop] <= maxVal;
-                }
-            }
-            else if (minEqual && maxEqual) {
-                return function (item) {
-                    return minVal <= item[prop] <= maxVal;
-                }
-            }
-            else {
-                return function (item) {
-                    return minVal < item[prop] < maxVal;
-                }
-            }
-        }
+        }        
 
         function setChartEmpty(chart) {
             if (!chart.dataLabels) {
@@ -184,14 +139,14 @@
                     var glasses = eyeGlasses.true;
                     var noGlasses = eyeGlasses.false;
 
-                    var beard = $filter('filter')(_faces, greaterThanPredicate('Beard', 0)).length;
-                    var mustaches = $filter('filter')(_faces, greaterThanPredicate('Mustaches', 0)).length;
+                    var beard = $filter('filter')(_faces, UtilityService.greaterThanPredicate('Beard', 0)).length;
+                    var mustaches = $filter('filter')(_faces, UtilityService.greaterThanPredicate('Mustaches', 0)).length;
                     var nothing = _faces.length > (beard + mustaches) ? _faces.length - (beard + mustaches) : 0;                    
 
-                    var children = $filter('filter')(_faces, lessThanPredicate('Age', 12, true)).length;
-                    var teens = $filter('filter')(_faces, betweenPredicate('Age', 12, 19, false, true)).length;
-                    var adults = $filter('filter')(_faces, betweenPredicate('Age', 19, 60, false, true)).length;
-                    var elders = $filter('filter')(_faces, greaterThanPredicate('Age', 60)).length;
+                    var children = $filter('filter')(_faces, UtilityService.lessThanPredicate('Age', 12, true)).length;
+                    var teens = $filter('filter')(_faces, UtilityService.betweenPredicate('Age', 12, 19, false, true)).length;
+                    var adults = $filter('filter')(_faces, UtilityService.betweenPredicate('Age', 19, 60, false, true)).length;
+                    var elders = $filter('filter')(_faces, UtilityService.greaterThanPredicate('Age', 60)).length;
 
                     setChartValues($ctrl.charts.Sex, [males, females]);
                     setChartValues($ctrl.charts.Glasses, [glasses, noGlasses]);

@@ -1,23 +1,51 @@
 ﻿<div class="container-fluid">
     <div class="row">
         <div class="col-xs-2">
-            <div class="flexbox-column-left" style="margin-top:25%;"> 
-                <label> Caratteristica: </label>
-                <md-select ng-model="$ctrl.selectedCharacteristic" ng-change="$ctrl.reload()">                    
-                    <md-option ng-repeat="c in $ctrl.characteristics" ng-value="c">{{ c.name }}</md-option>
+            <div class="flexbox-column-left" style="margin-top:25%;">
+                <label>Tipo Grafico:</label>
+                <md-select ng-model="$ctrl.selectedChartType" ng-change="$ctrl.reload()">
+                    <md-option ng-repeat="c in $ctrl.chartTypes" ng-value="c">{{ c.label }}</md-option>
                 </md-select>
+
+                <div ng-if="$ctrl.selectedChartType">
+                    <label>Selezione:</label>
+                    <md-select ng-model="$ctrl.selectedQueryType" ng-change="$ctrl.reload()">
+                        <md-option ng-repeat="q in $ctrl.queryTypes" ng-value="q">{{ q.label }}</md-option>
+                    </md-select>
+                </div>
+
+                <div ng-if="$ctrl.selectedQueryType && $ctrl.selectedQueryType.id == 's'">
+                    <label>Caratteristica:</label>
+                    <md-select ng-model="$ctrl.selectedCharacteristic" ng-change="$ctrl.reload()">
+                        <md-option ng-repeat="c in $ctrl.characteristics" ng-value="c">{{ c.name }}</md-option>
+                    </md-select>
+                </div>
+
+                <div ng-if="$ctrl.selectedQueryType && $ctrl.selectedQueryType.id == 'm'">
+                    <label>Caratteristica:</label>
+                    <div ng-repeat="c in $ctrl.characteristics">
+                        <md-checkbox ng-checked="c.selected" ng-click="c.selected = !c.selected; $ctrl.reload()">
+                            {{ c.name }}
+                        </md-checkbox>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="col-xs-8">
-            <canvas id="barChart" class="chart chart-bar"
-                    chart-data="$ctrl.data" chart-labels="$ctrl.labels"
-                    chart-series="$ctrl.series" chart-options="$ctrl.options"></canvas>
+            <div class="content-overlay flexbox-row" ng-show="$ctrl.loading">
+                <md-progress-circular md-mode="indeterminate"></md-progress-circular>
+            </div>
+            <div style="position: relative; height: 70vh">
+                <canvas id="barChart" class="chart chart-base" chart-type="$ctrl.selectedChartType.id"
+                        chart-data="$ctrl.data" chart-labels="$ctrl.labels"
+                        chart-series="$ctrl.series" chart-options="$ctrl.options"></canvas>
+            </div>
         </div>
         <div class="col-xs-2">
             <div class="flexbox-column-left" style="margin-top:25%;">
                 <label>Da:</label>
                 <md-datepicker ng-model="$ctrl.startDate" ng-change="$ctrl.reload()"></md-datepicker>
-                <br/>
+                <br />
                 <label>A:</label>
                 <md-datepicker ng-model="$ctrl.endDate" ng-change="$ctrl.reload()"></md-datepicker>
             </div>
