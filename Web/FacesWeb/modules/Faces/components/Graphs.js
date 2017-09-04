@@ -19,15 +19,23 @@
 
         function init() {
             $ctrl.chartTypes = [
-                { id: 'bar', label: 'Barre' },
-                { id: 'horizontalBar', label: 'Barre Orizzontali' },
-                { id: 'line', label: 'Linee' },
-                { id: 'radar', label: 'Radar' }
+                { id: 'bar', label: 'Barre', type: 'many' },
+                { id: 'horizontalBar', label: 'Barre Orizzontali', type: 'many' },
+                { id: 'line', label: 'Linee', type: 'many' },
+                { id: 'radar', label: 'Radar', type: 'many' },
+                { id: 'pie', label: 'Torta', type: 'single' },
+                { id: 'doughnut', label: 'Ciambella', type: 'single' },
+                { id: 'polarArea', label: 'Area Polare', type: 'single' }
             ]
 
             $ctrl.queryTypes = [
                 { id: 's', label: 'Caratteristica singola' },
                 { id: 'm', label: 'Caratteristiche multiple' },
+            ]
+
+            $ctrl.temporalDetails = [
+                { id: ChartService.temporalDetail.week, label: 'Settimana' },
+                { id: ChartService.temporalDetail.month, label: 'Mese' },
             ]
 
 
@@ -42,7 +50,7 @@
                     position: 'bottom'
                 },
                 responsive: true,
-                maintainAspectRatio: false,                
+                maintainAspectRatio: false,
             }
             $ctrl.labels = [];
             $ctrl.data = [];
@@ -61,7 +69,7 @@
             $ctrl.endDate = new Date();
             $ctrl.startDate = new Date();
             $ctrl.startDate.setDate(1);
-
+            $ctrl.selectedTemporalDetail = $ctrl.temporalDetails[1];
 
             _subscription = StoreTreeService.subscribe(reload);
 
@@ -72,6 +80,52 @@
 
         function selectSingleCharacteristic() {
 
+        }
+
+        function changeChartType() {
+
+            var index = $ctrl.queryTypes.findIndex(function (element) {
+                return element.id == 'm';
+            });
+
+            if ($ctrl.selectedChartType.type == 'many' && index == -1) {
+                $ctrl.queryTypes.push({ id: 'm', label: 'Caratteristica multipla' });
+            }
+            else if ($ctrl.selectedChartType.type == 'single' && index != -1) {
+                $ctrl.queryTypes.splice(index, 1);
+            }
+
+            if ($ctrl.selectedChartType.type == 'single') {
+                $ctrl.options['tooltips'] = {
+                    callbacks: {
+                        label: function (tooltipItem, data) {
+                            var allData = data.datasets[tooltipItem.datasetIndex].data;
+                            var tooltipLabel = data.labels[tooltipItem.index];
+                            var tooltipData = allData[tooltipItem.index];
+                            var total = 0;
+                            for (var i in allData) {
+                                total += allData[i];
+                            }
+                            var tooltipPercentage = Math.round((tooltipData / total) * 100);
+                            return tooltipLabel + ': ' + tooltipData + ' (' + tooltipPercentage + '%)';
+                        }
+                    }
+                }
+
+                if ($ctrl.selectedChartType.id == 'pie' || $ctrl.selectedChartType.id == 'doughnut') {
+                    $ctrl.options['pieceLabel'] = {
+                        mode: 'percentage',
+                        precision: 2
+                    }
+                }
+
+            }
+            else {
+                delete $ctrl.options['tooltips'];
+                delete $ctrl.options['pieceLabel'];
+            }
+
+            $ctrl.reload();
         }
 
         function reload() {
@@ -93,25 +147,24 @@
             $ctrl.labels = [];
             $ctrl.series = [];
 
-            $ctrl.labels = ChartService.getMonthLabels($ctrl.startDate, $ctrl.endDate);
-            var dateFilters = ChartService.getMonthFilters($ctrl.startDate, $ctrl.endDate);
-            var numberOfMonths = ChartService.getNumberOfMonths($ctrl.startDate, $ctrl.endDate);
+            if ($ctrl.selectedChartType.type == 'single') {
+                $ctrl.labels = angular.copy($ctrl.selectedCharacteristic.labels);
+            }
+            else {
+                $ctrl.labels = ChartService.getLabels($ctrl.startDate, $ctrl.endDate, $ctrl.selectedTemporalDetail.id);
+            }
+            var dateFilters = ChartService.getFilters($ctrl.startDate, $ctrl.endDate, $ctrl.selectedTemporalDetail.id);
+            var numberOfItems = ChartService.getNumberOfItems($ctrl.startDate, $ctrl.endDate, $ctrl.selectedTemporalDetail.id);
             var promiseList = [];
 
             switch ($ctrl.selectedQueryType.id) {
                 case 's':
-                    $ctrl.series = angular.copy($ctrl.selectedCharacteristic.labels);
-                    $ctrl.series.map(function () {
-                        $ctrl.data.push(new Array(numberOfMonths));
-                    })
-
-                    if ($ctrl.selectedCharacteristic.canGroup) {
-                        dateFilters.map(d => {
-                            var xIndex = d.index;
-                            promiseList.push(OdataService.getFaces(new Date(d.year, d.month, 1),
+                    if ($ctrl.selectedChartType.type == 'single') {
+                        if ($ctrl.selectedCharacteristic.canGroup) {
+                            promiseList.push(OdataService.getFaces($ctrl.startDate,
                                 context.cameras,
-                                new Date(d.year, d.month, d.days),
-                                true,
+                                $ctrl.endDate,
+                                false,
                                 null,
                                 [$ctrl.selectedCharacteristic.id],
                                 { property: 'ID', transformation: 'countdistinct', alias: 'total' }
@@ -119,38 +172,85 @@
                                 //$ctrl.loading = false;
                                 if (response.status == 200 && response.data.value.length) {
                                     var counts = ChartService.getCharacteristicGroupsCount($ctrl.selectedCharacteristic, response.data.value);
-                                    for (var i = 0; i < counts.length; i++) {
-                                        $ctrl.data[i][xIndex] = counts[i];
-                                    }                                    
+                                    $ctrl.data = counts;
                                 }
                                 else {
                                     //setChartsEmpty($ctrl.charts);
                                 }
                             }, function (error) { $ctrl.loading = false; }))
-                        });
-                    }
-                    else {
-                        dateFilters.map(d => {
-                            var xIndex = d.index;
-                            promiseList.push(OdataService.getFaces(new Date(d.year, d.month, 1),
+                        }
+                        else {
+                            promiseList.push(OdataService.getFaces($ctrl.startDate,
                                 context.cameras,
-                                new Date(d.year, d.month, d.days),
-                                true,
+                                $ctrl.endDate,
+                                false,
                                 null, null, null,
                                 [$ctrl.selectedCharacteristic.id]
                             ).then(function (response) {
                                 //$ctrl.loading = false;
                                 if (response.status == 200 && response.data.value.length) {
                                     var counts = ChartService.getCharacteristicCount($ctrl.selectedCharacteristic, response.data.value);
-                                    for (var i = 0; i < counts.length; i++) {
-                                        $ctrl.data[i][xIndex] = counts[i];
-                                    }
+                                    $ctrl.data = counts;
                                 }
                                 else {
                                     //setChartsEmpty($ctrl.charts);
                                 }
                             }, function (error) { $ctrl.loading = false; }))
-                        });
+                        }
+                    }
+                    else {
+                        $ctrl.series = angular.copy($ctrl.selectedCharacteristic.labels);
+                        $ctrl.series.map(function () {
+                            $ctrl.data.push(new Array(numberOfItems));
+                        })
+
+                        if ($ctrl.selectedCharacteristic.canGroup) {
+                            dateFilters.map(d => {
+                                var xIndex = d.index;
+                                promiseList.push(OdataService.getFaces(new Date(d.year, d.months[0], d.firstDay),
+                                    context.cameras,
+                                    new Date(d.year, d.months[1], d.lastDay),
+                                    false,
+                                    null,
+                                    [$ctrl.selectedCharacteristic.id],
+                                    { property: 'ID', transformation: 'countdistinct', alias: 'total' }
+                                ).then(function (response) {
+                                    //$ctrl.loading = false;
+                                    if (response.status == 200 && response.data.value.length) {
+                                        var counts = ChartService.getCharacteristicGroupsCount($ctrl.selectedCharacteristic, response.data.value);
+                                        for (var i = 0; i < counts.length; i++) {
+                                            $ctrl.data[i][xIndex] = counts[i];
+                                        }
+                                    }
+                                    else {
+                                        //setChartsEmpty($ctrl.charts);
+                                    }
+                                }, function (error) { $ctrl.loading = false; }))
+                            });
+                        }
+                        else {
+                            dateFilters.map(d => {
+                                var xIndex = d.index;
+                                promiseList.push(OdataService.getFaces(new Date(d.year, d.months[0], d.firstDay),
+                                    context.cameras,
+                                    new Date(d.year, d.months[1], d.lastDay),
+                                    false,
+                                    null, null, null,
+                                    [$ctrl.selectedCharacteristic.id]
+                                ).then(function (response) {
+                                    //$ctrl.loading = false;
+                                    if (response.status == 200 && response.data.value.length) {
+                                        var counts = ChartService.getCharacteristicCount($ctrl.selectedCharacteristic, response.data.value);
+                                        for (var i = 0; i < counts.length; i++) {
+                                            $ctrl.data[i][xIndex] = counts[i];
+                                        }
+                                    }
+                                    else {
+                                        //setChartsEmpty($ctrl.charts);
+                                    }
+                                }, function (error) { $ctrl.loading = false; }))
+                            });
+                        }
                     }
                     break;
                 case 'm':
@@ -161,19 +261,17 @@
                         selectList.push(c.id);
                     })
                     $ctrl.series.map(function () {
-                        $ctrl.data.push(new Array(numberOfMonths));
+                        $ctrl.data.push(new Array(numberOfItems));
                     });
-                    //$ctrl.loading = false;
                     dateFilters.map(d => {
                         var xIndex = d.index;
-                        promiseList.push(OdataService.getFaces(new Date(d.year, d.month, 1),
+                        promiseList.push(OdataService.getFaces(new Date(d.year, d.months[0], d.firstDay),
                             context.cameras,
-                            new Date(d.year, d.month, d.days),
-                            true,
+                            new Date(d.year, d.months[1], d.lastDay),
+                            false,
                             null, null, null,
                             selectList
                         ).then(function (response) {
-                            //$ctrl.loading = false;
                             if (response.status == 200 && response.data.value.length) {
                                 var counts = ChartService.getCharacteristicListCount(selectedCharacteristicList, response.data.value);
                                 for (var i = 0; i < counts.length; i++) {
@@ -204,6 +302,7 @@
 
         $ctrl.$onInit = init;
         $ctrl.$onDestroy = clean;
+        $ctrl.changeChartType = changeChartType;
         $ctrl.reload = reload;
     }
 })();

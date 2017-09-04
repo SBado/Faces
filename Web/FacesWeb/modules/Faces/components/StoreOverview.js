@@ -54,7 +54,7 @@
             $ctrl.charts = {};
             $ctrl.charts['Sex'] = {
                 id: 'sex',
-                labels: ['Males', 'Females'],
+                labels: ['Maschi', 'Femmine'],
             };
             $ctrl.charts['Age'] = {
                 id: 'age',
@@ -62,25 +62,25 @@
             };
             $ctrl.charts['Glasses'] = {
                 id: 'glasses',
-                labels: ['Glasses', 'No Glasses'],
+                labels: ['Con Occhiali', 'Senza Occhiali'],
             };
             $ctrl.charts['Beard'] = {
                 id: 'beard',
-                labels: ['Beard', 'Mustaches', 'Nothing'],
+                labels: ['Barba', 'Baffi', 'Niente'],
             };
 
             angular.forEach($ctrl.charts, function (chart) {
-                chart.emptyLabel = ['No data'];
+                chart.emptyLabel = ['Nessun dato'];
                 chart.dataLabels = chart.labels;
                 chart.data = null;
                 chart.options = angular.copy(options);
                 chart.chartsOverride = null;
             });
 
-            $ctrl.charts.Sex.options.title.text = 'Sex';
-            $ctrl.charts.Age.options.title.text = 'Age';
-            $ctrl.charts.Glasses.options.title.text = 'Glasses';
-            $ctrl.charts.Beard.options.title.text = 'Beard';
+            $ctrl.charts.Sex.options.title.text = 'Sesso';
+            $ctrl.charts.Age.options.title.text = 'Età';
+            $ctrl.charts.Glasses.options.title.text = 'Occhiali';
+            $ctrl.charts.Beard.options.title.text = 'Barba';
 
             if (StoreTreeService.getContext()) {
                 reload();
@@ -123,7 +123,9 @@
                 return;
             }
 
-            OdataService.getFacesInStore(new Date(), context.cameras).then(function (response) {
+            var today = new Date();
+
+            OdataService.getFacesInStore(new Date(today.getFullYear(), today.getMonth(), today.getDate()), context.cameras).then(function (response) {
                 if (response.status == 200 && response.data.value.length) {
                     _faces = response.data.value;
 

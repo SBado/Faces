@@ -33,7 +33,7 @@
             return getAll('Faces', options);
         }
 
-        self.getFaces = function (inDate, cameras, outDate, isDateRange, filter, groupByList, aggregate, selectList) {
+        self.getFaces = function (inDate, cameras, outDate, dateEquality, filter, groupByList, aggregate, selectList) {
             if (outDate && outDate < inDate) {
                 return createEmptyResponse();
             }
@@ -46,18 +46,14 @@
             cameraFilter = cameraFilter.slice(0, -4);
             cameraFilter = " and (" + cameraFilter + ")";
 
-            var comparator = isDateRange ? ' ge ' : ' eq ';
-            var dateFilter = 'year(EntranceTimestamp)' + comparator + inDate.getFullYear() +
-                ' and month(EntranceTimestamp)' + comparator  + (inDate.getMonth() + 1) +
-                ' and day(EntranceTimestamp)' + comparator + inDate.getDate() +
-                ' and hour(EntranceTimestamp) ge 0';
+            var comparator = dateEquality ? ' eq ' : ' ge ';
+            //var dateFilter = 'EntranceTimestamp' + comparator + inDate.toISOString(); ///// UTC
+            var dateFilter = 'EntranceTimestamp' + comparator + new Date(inDate.getTime() - (inDate.getTimezoneOffset() * 60000)).toISOString();
 
             if (outDate) {
-                comparator = isDateRange ? ' le ' : ' eq '
-                dateFilter += ' and year(ExitTimestamp)' + comparator + outDate.getFullYear() +
-                    ' and month(ExitTimestamp)' + comparator + (outDate.getMonth() + 1) +
-                    ' and day(ExitTimestamp)' + comparator + outDate.getDate() +
-                    ' and hour(ExitTimestamp) le 23';
+                comparator = dateEquality ? ' eq ' : ' le '
+                //dateFilter += ' and ExitTimestamp' + comparator + outDate.toISOString(); ///// UTC
+                dateFilter += ' and ExitTimestamp' + comparator + new Date(outDate.getTime() - (outDate.getTimezoneOffset() * 60000)).toISOString();
             }
 
             var select = '';
@@ -88,7 +84,7 @@
 
         }
 
-        self.getFacesInStore = function (inDate, cameras, outDate) {
+        self.getFacesInStore = function (inDate, cameras) {
             return self.getFaces(inDate, cameras);
         }
 
