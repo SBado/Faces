@@ -2,12 +2,12 @@
     'use strict';
 
     angular.module('faces')
-        .component('graphs', {
-            templateUrl: 'modules/Faces/components/templates/Graphs.html',
-            controller: GraphsController
+        .component('charts', {
+            templateUrl: 'modules/Faces/components/templates/Charts.html',
+            controller: ChartsController
         });
 
-    function GraphsController($q, $scope, $filter, StoreTreeService, OdataService, ChartService, UtilityService) {
+    function ChartsController($q, $scope, $filter, StoreTreeService, OdataService, ChartService, UtilityService) {
 
         var $ctrl = this;
         var _subscription = null;
@@ -33,9 +33,10 @@
                 { id: 'm', label: 'Caratteristiche multiple' },
             ]
 
-            $ctrl.temporalDetails = [
-                { id: ChartService.temporalDetail.week, label: 'Settimana' },
+            $ctrl.temporalDetails = [                                
                 { id: ChartService.temporalDetail.month, label: 'Mese' },
+                { id: ChartService.temporalDetail.week, label: 'Settimana' },
+                { id: ChartService.temporalDetail.day, label: 'Giorno' }
             ]
 
 
@@ -69,7 +70,7 @@
             $ctrl.endDate = new Date();
             $ctrl.startDate = new Date();
             $ctrl.startDate.setDate(1);
-            $ctrl.selectedTemporalDetail = $ctrl.temporalDetails[1];
+            $ctrl.selectedTemporalDetail = $ctrl.temporalDetails[0];
 
             _subscription = StoreTreeService.subscribe(reload);
 
@@ -207,9 +208,9 @@
                         if ($ctrl.selectedCharacteristic.canGroup) {
                             dateFilters.map(d => {
                                 var xIndex = d.index;
-                                promiseList.push(OdataService.getFaces(new Date(d.year, d.months[0], d.firstDay),
+                                promiseList.push(OdataService.getFaces(d.firstDate,
                                     context.cameras,
-                                    new Date(d.year, d.months[1], d.lastDay),
+                                    d.lastDate,
                                     false,
                                     null,
                                     [$ctrl.selectedCharacteristic.id],
@@ -231,9 +232,9 @@
                         else {
                             dateFilters.map(d => {
                                 var xIndex = d.index;
-                                promiseList.push(OdataService.getFaces(new Date(d.year, d.months[0], d.firstDay),
+                                promiseList.push(OdataService.getFaces(d.firstDate,
                                     context.cameras,
-                                    new Date(d.year, d.months[1], d.lastDay),
+                                    d.lastDate,
                                     false,
                                     null, null, null,
                                     [$ctrl.selectedCharacteristic.id]
@@ -265,9 +266,9 @@
                     });
                     dateFilters.map(d => {
                         var xIndex = d.index;
-                        promiseList.push(OdataService.getFaces(new Date(d.year, d.months[0], d.firstDay),
+                        promiseList.push(OdataService.getFaces(d.firstDate,
                             context.cameras,
-                            new Date(d.year, d.months[1], d.lastDay),
+                            d.lastDate,
                             false,
                             null, null, null,
                             selectList

@@ -40,14 +40,14 @@
                     }
                 }
             })
-            .state('home.graphs', {
-                url: "/graphs",
+            .state('home.charts', {
+                url: "/charts",
                 data: {
                     pageTitle: 'Grafici'
                 },
                 views: {
                     'pages': {
-                        template: '<graphs>'
+                        template: '<charts>'
                     }
                 }
             });

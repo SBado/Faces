@@ -115,14 +115,14 @@
 
 
         function getNumberOfDays(startDate, endDate) {
-            return Math.round((endDate - startDate) / (1000 * 60 * 60 * 24));
+            return Math.round((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
         }
 
         function loopDays(startDate, numberOfDays, fn, param) {
             var loopNumber = 0;            
             var year = startDate.getFullYear();
             var month = startDate.getMonth();
-            var daysInMonth = days(month);
+            var daysInMonth = days[month];
             var lastSelectedMonth = month;
             var lastSelectedDay = startDate.getDate();            
             for (var day = lastSelectedDay; day <= daysInMonth; day = (day + 1) % (daysInMonth + 1)) {
@@ -131,14 +131,14 @@
                 }
                 if (lastSelectedDay > day) {
                     month++;
-                    daysInMonth = days(month)
+                    daysInMonth = days[month];
 
                     if (lastSelectedMonth > month) {
                         year++;
                     }
                 }
 
-                fn(param, year, month, day, loopNumber);
+                fn(param, new Date(year, month, day, 0, 0, 0), loopNumber);
 
                 loopNumber++;
                 if (loopNumber == numberOfDays) {
@@ -149,17 +149,25 @@
             }
         }
 
-        function createDayLabel(labelList, year, month, day) {
-            labelList.push(day + ' ' + months[month] + ' ' + year);
+        function createDayLabel(labelList, date) {
+            labelList.push(date.getDate() + ' ' + months[date.getMonth()] + ' ' + date.getFullYear());
         }
 
-        function createDayFilter(filterList, year, month, day, index) {
+        function createDayFilter(filterList, firstDate, index) {
+            var lastDate = angular.copy(firstDate);
+            lastDate.setHours(23, 59, 59);
             filterList.push({
                 index: index,
-                year: year,
-                months: [month, month],
-                firstDay: day,
-                lastDay: day
+                firstDate: firstDate,
+                lastDate: lastDate,
+                //year: year,
+                //months: [month, month],
+                //firstDay: day,
+                //lastDay: day,
+                //firstHour: 0,
+                //firstMinute: 0,
+                //lastHour: 23,
+                //lastMinute: 59
             })
         }
 
@@ -214,7 +222,7 @@
                     weeksInYear(year)
                 }
 
-                fn(param, year, getMonthsOfWeek(week, year), week, loopNumber);
+                fn(param, getDateOfWeek(week, year), loopNumber);
 
                 loopNumber++;
                 if (loopNumber == numberOfWeeks) {
@@ -224,31 +232,52 @@
             }
         }
 
-        function createWeekLabel(labelList, year, monthList, week) {
+        function createWeekLabel(labelList, date) {
             var monthLabel = '';
-            monthList.map(m => {
-                if (monthLabel) {
-                    monthLabel += '/';
-                }
-                monthLabel += months[m]
-            })
-            labelList.push(monthLabel + ' ' + year + '-' + week);
+            var yearLabel = '';
+            var lastDate = new Date(date.getDate() + 6);
+
+            var firstMonth = date.getMonth();
+            var lastMonth = lastDate.getMonth();
+            if (firstMonth != lastMonth) {
+                monthLabel = firstMonth + '/' + lastMonth;
+            }
+            else {
+                monthLabel = firstMonth;
+            }
+
+            var firstYear = date.getFullYear();
+            var lastYear = lastDate.getFullYear();
+            if (firstYear != lastYear) {
+                yearLabel = firstYear + '/' + lastYear;
+            }
+            else {
+                yearLabel = firstYear;
+            }
+
+            labelList.push(monthLabel + ' ' + yearLabel + '-' + getWeekNumber(date));
         }
 
-        function createWeekFilter(filterList, year, monthList, week, index) {
-            var firstDay = getDateOfWeek(week, year);
-            var lastDay = angular.copy(firstDay);
-            lastDay.setDate(firstDay.getDate() + 6);            
-            if (monthList.length == 1) {
-                monthList.push(monthList[0]);
-            }
+        function createWeekFilter(filterList, firstDate, index) {            
+            var lastDate = angular.copy(firstDate);
+            lastDate.setDate(lastDate.getDate() + 6);            
+            //if (monthList.length == 1) {
+            //    monthList.push(monthList[0]);
+            //}
+            lastDate.setHours(23, 59, 59);
 
             filterList.push({
                 index: index,
-                year: year,                
-                months: monthList,
-                firstDay: firstDay.getDate(),
-                lastDay: lastDay.getDate()          
+                firstDate: firstDate,
+                lastDate: lastDate,
+                //year: year,                
+                //months: monthList,
+                //firstDay: date.getDate(),
+                //lastDay: lastDate.getDate(),
+                //firstHour: 0,
+                //firstMinute: 0,
+                //lastHour: 23,
+                //lastMinute: 59
             })
         }
 
@@ -296,7 +325,7 @@
                     year++;
                 }
 
-                fn(param, year, month, loopNumber);
+                fn(param, new Date(year, month, 1, 0, 0, 0), loopNumber);
                 
                 loopNumber++;
                 if (loopNumber == numberOfMonths) {
@@ -306,17 +335,26 @@
             }
         }
 
-        function createMonthLabel(labelList, year, month) {
-            labelList.push(months[month] + ' ' + year);
+        function createMonthLabel(labelList, date) {
+            labelList.push(months[date.getMonth()] + ' ' + date.getFullYear());
         }
 
-        function createMonthFilter(filterList, year, month, index) {            
+        function createMonthFilter(filterList, firstDate, index) {
+            var lastDate = angular.copy(firstDate);
+            lastDate.setDate(days[lastDate.getMonth()]);
+            lastDate.setHours(23, 59, 59);
             filterList.push({
                 index: index,
-                year: year,
-                months: [month, month],
-                firstDay: 1,
-                lastDay: days[month]
+                firstDate: firstDate,
+                lastDate: lastDate,
+                //year: year,
+                //months: [month, month],
+                //firstDay: 1,
+                //lastDay: days[month],
+                //firstHour: 0,
+                //firstMinute: 0,
+                //lastHour: 23,
+                //lastMinute: 59
             })
         }
 
@@ -357,6 +395,7 @@
         }
 
         self.temporalDetail = {
+            day: 'd',
             week: 'w',
             month: 'm'
         }
@@ -399,30 +438,45 @@
         }
 
         self.getLabels = function (startDate, endDate, temporalDetail) {
-            if (temporalDetail == self.temporalDetail.week) {
-                return getWeekLabels(startDate, endDate);
-            }
-            if (temporalDetail == self.temporalDetail.month) {
-                return getMonthLabels(startDate, endDate);
-            }
+            switch (temporalDetail) {
+                case self.temporalDetail.day:
+                    return getDayLabels(startDate, endDate);
+                    break;
+                case self.temporalDetail.week:
+                    return getWeekLabels(startDate, endDate);
+                    break;
+                case self.temporalDetail.month:
+                    return getMonthLabels(startDate, endDate);
+                    break;
+            }                  
         }
 
         self.getFilters = function (startDate, endDate, temporalDetail) {
-            if (temporalDetail == self.temporalDetail.week) {
-                return getWeekFilters(startDate, endDate);
-            }
-            if (temporalDetail == self.temporalDetail.month) {
-                return getMonthFilters(startDate, endDate);
-            }
+            switch (temporalDetail) {
+                case self.temporalDetail.day:
+                    return getDayFilters(startDate, endDate);
+                    break;
+                case self.temporalDetail.week:
+                    return getWeekFilters(startDate, endDate);
+                    break;
+                case self.temporalDetail.month:
+                    return getMonthFilters(startDate, endDate);
+                    break;
+            }                
         }
 
         self.getNumberOfItems = function (startDate, endDate, temporalDetail) {
-            if (temporalDetail == self.temporalDetail.week) {
-                return getNumberOfWeeks(startDate, endDate);
-            }
-            if (temporalDetail == self.temporalDetail.month) {
-                return getNumberOfMonths(startDate, endDate);
-            }
+            switch (temporalDetail) {
+                case self.temporalDetail.day:
+                    return getNumberOfDays(startDate, endDate);
+                    break;
+                case self.temporalDetail.week:
+                    return getNumberOfWeeks(startDate, endDate);
+                    break;
+                case self.temporalDetail.month:
+                    return getNumberOfMonths(startDate, endDate);
+                    break;
+            }            
         }
 
         return self;
