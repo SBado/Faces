@@ -6,6 +6,9 @@
             templateUrl: 'modules/Faces/components/templates/Camera.html',            
             bindings: {
                 cameraName: '<',
+                cameraStatus: '<',
+                cameraColor: '<',
+                imagePath: '<',
                 todayRecordedFaces: '<',
                 totalRecordedFaces: '<'
             }

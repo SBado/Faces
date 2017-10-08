@@ -33,13 +33,13 @@
             return getAll('Faces', options);
         }
 
-        self.getFaces = function (inDate, cameras, outDate, dateEquality, filter, groupByList, aggregate, selectList) {
+        self._getFaces = function (inDate, cameraList, outDate, dateEquality, filter, groupByList, aggregate, selectList) {
             if (outDate && outDate < inDate) {
                 return createEmptyResponse();
             }
-            
+
             var cameraFilter = '';
-            cameras.map(camera => cameraFilter += 'EntranceCamera eq ' + camera.ID + ' or ');
+            cameraList.map(camera => cameraFilter += 'EntranceCamera eq ' + camera.ID + ' or ');
             if (!cameraFilter) {
                 return createEmptyResponse();
             }
@@ -84,8 +84,56 @@
 
         }
 
-        self.getFacesInStore = function (inDate, cameras) {
-            return self.getFaces(inDate, cameras);
+        self.getFaces = function (dateRangeList, cameraList, filter, groupByList, aggregate, selectList) {
+            var cameraFilter = '';
+            cameraList.map(camera => {
+                if (cameraFilter) {
+                    cameraFilter += ' or ';
+                }
+                cameraFilter += '(EntranceCamera eq ' + camera.ID + ')'
+            });
+            if (!cameraFilter) {
+                return createEmptyResponse();
+            }
+            
+            var dateFilter = '';
+            dateRangeList.map(range => {
+                var firstDate = range.firstDate;
+                var lastDate = range.lastDate;
+                if (lastDate && lastDate < firstDate) {
+                    return;
+                }
+                if (dateFilter) {
+                    dateFilter += ' or ';
+                }
+                if (!lastDate) {
+                    dateFilter += '(EntranceTimestamp ge ' + new Date(firstDate.getTime() - (firstDate.getTimezoneOffset() * 60000)).toISOString() + ' and ExitTimestamp eq null)';                    
+                }
+                else {
+                    dateFilter += '(EntranceTimestamp le ' + new Date(lastDate.getTime() - (lastDate.getTimezoneOffset() * 60000)).toISOString();
+                    dateFilter += ' and ExitTimestamp ge ' + new Date(firstDate.getTime() - (firstDate.getTimezoneOffset() * 60000)).toISOString() + ')';
+
+                }
+            });
+
+            var select = '';
+            if (selectList) {
+                select = '&$select=' + selectList.join(',');
+            }
+
+
+            if (groupByList && aggregate) {
+                return self.getAllFaces('$apply=filter((' + dateFilter + ') and (' + cameraFilter +
+                    '))/groupby((' + groupByList.join(',') +
+                    '),aggregate(' + aggregate.property +
+                    ' with ' + aggregate.transformation +
+                    ' as ' + aggregate.alias + '))');
+            }
+            return self.getAllFaces('$filter=(' + dateFilter + ') and (' + cameraFilter + ')' + select);
+        }
+
+        self.getFacesInStore = function (dateRangeList, cameraList) {
+            return self.getFaces(dateRangeList, cameraList);
         }
 
         self.getBaskets = function (options) {
@@ -126,9 +174,9 @@
             }
         }
 
-        self.getCamerasFacesCount = function (cameras, date) {
+        self.getCamerasFacesCount = function (cameraList, date) {
             var cameraFilter = '';
-            cameras.map(camera => cameraFilter += 'ID eq ' + camera.ID + ' or ');
+            cameraList.map(camera => cameraFilter += 'ID eq ' + camera.ID + ' or ');
             if (cameraFilter) {
                 cameraFilter = cameraFilter.slice(0, -4);
                 cameraFilter = " and (" + cameraFilter + ")";

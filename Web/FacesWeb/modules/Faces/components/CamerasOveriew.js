@@ -11,6 +11,7 @@
 
         var $ctrl = this;
         var _subscription = null;
+        var _imagesBasePath = 'modules/Faces/images/svg';
 
         function init() {
             $ctrl.cameraList = [];
@@ -34,10 +35,17 @@
                             $ctrl.cameraList.push({
                                 ID: camera.ID,
                                 Name: camera.Name,
+                                Status: 'Online',
+                                Color: 'green',
+                                ImagePath: [_imagesBasePath, 'videocam_green.svg'].join('/'),
                                 TotalRecordedFaces: recordedFaces,
                                 TodayRecordedFaces: 0
                             });
-                        })
+                        });
+
+                        $ctrl.cameraList[$ctrl.cameraList.length - 1].Status = 'Offline'
+                        $ctrl.cameraList[$ctrl.cameraList.length - 1].Color = 'red'
+                        $ctrl.cameraList[$ctrl.cameraList.length - 1].ImagePath = [_imagesBasePath, 'videocam_red.svg'].join('/'),
 
                         OdataService.getCamerasFacesCount(context.cameras, new Date())
                             .then(function (response) {

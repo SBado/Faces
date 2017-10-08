@@ -125,7 +125,9 @@
 
             var today = new Date();
 
-            OdataService.getFacesInStore(new Date(today.getFullYear(), today.getMonth(), today.getDate()), context.cameras).then(function (response) {
+            OdataService.getFacesInStore([{
+                firstDate: new Date(today.getFullYear(), today.getMonth(), today.getDate())
+            }], context.cameras).then(function (response) {
                 if (response.status == 200 && response.data.value.length) {
                     _faces = response.data.value;
 

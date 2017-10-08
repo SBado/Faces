@@ -3,7 +3,7 @@
         <div class="col-xs-2">
             <div class="flexbox-column-left" style="margin-top:25%;">
                 <label>Tipo Grafico:</label>
-                <md-select ng-model="$ctrl.selectedChartType" ng-change="$ctrl.changeChartType()">
+                <md-select ng-model="$ctrl.selectedChartType" ng-change="$ctrl.changeChartType(); $ctrl.reload()">
                     <md-option ng-repeat="c in $ctrl.chartTypes" ng-value="c">{{ c.label }}</md-option>
                 </md-select>
 
@@ -44,13 +44,13 @@
         <div class="col-xs-2">
             <div class="flexbox-column-left" style="margin-top:25%;">
                 <label>Da:</label>
-                <md-datepicker ng-model="$ctrl.startDate" ng-change="$ctrl.reload()"></md-datepicker>
+                <md-datepicker ng-model="$ctrl.firstDate" ng-change="$ctrl.reload()"></md-datepicker>
                 <br />
                 <label>A:</label>
-                <md-datepicker ng-model="$ctrl.endDate" ng-change="$ctrl.reload()"></md-datepicker>
+                <md-datepicker ng-model="$ctrl.lastDate" ng-change="$ctrl.reload()"></md-datepicker>
                 <br />
                 <label ng-if="$ctrl.selectedChartType.type == 'many'">Dettaglio:</label>
-                <md-select style="margin-left:65px;" ng-model="$ctrl.selectedTemporalDetail" ng-change="$ctrl.reload()" ng-if="$ctrl.selectedChartType.type == 'many'">
+                <md-select style="margin-left:20px;" ng-model="$ctrl.selectedTemporalDetail" ng-change="$ctrl.reload()" ng-if="$ctrl.selectedChartType.type == 'many'">
                     <md-option ng-repeat="d in $ctrl.temporalDetails" ng-value="d">{{ d.label }}</md-option>
                 </md-select>
             </div>

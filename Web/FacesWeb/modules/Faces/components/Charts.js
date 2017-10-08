@@ -13,8 +13,8 @@
         var _subscription = null;
 
         function canLoad() {
-            return ($ctrl.selectedQueryType && $ctrl.selectedQueryType.id == 's' && $ctrl.selectedCharacteristic) ||
-                ($ctrl.selectedQueryType && $ctrl.selectedQueryType.id == 'm' && $filter('filter')($ctrl.characteristics, { selected: true }).length);
+            return $ctrl.firstDate <= $ctrl.lastDate && (($ctrl.selectedQueryType && $ctrl.selectedQueryType.id == 's' && $ctrl.selectedCharacteristic) ||
+                ($ctrl.selectedQueryType && $ctrl.selectedQueryType.id == 'm' && $filter('filter')($ctrl.characteristics, { selected: true }).length));
         }
 
         function init() {
@@ -22,7 +22,7 @@
                 { id: 'bar', label: 'Barre', type: 'many' },
                 { id: 'horizontalBar', label: 'Barre Orizzontali', type: 'many' },
                 { id: 'line', label: 'Linee', type: 'many' },
-                { id: 'radar', label: 'Radar', type: 'many' },
+                //{ id: 'radar', label: 'Radar', type: 'many' },
                 { id: 'pie', label: 'Torta', type: 'single' },
                 { id: 'doughnut', label: 'Ciambella', type: 'single' },
                 { id: 'polarArea', label: 'Area Polare', type: 'single' }
@@ -33,10 +33,13 @@
                 { id: 'm', label: 'Caratteristiche multiple' },
             ]
 
-            $ctrl.temporalDetails = [                                
+            $ctrl.temporalDetails = [
                 { id: ChartService.temporalDetail.month, label: 'Mese' },
                 { id: ChartService.temporalDetail.week, label: 'Settimana' },
-                { id: ChartService.temporalDetail.day, label: 'Giorno' }
+                { id: ChartService.temporalDetail.day, label: 'Giorno' },             
+                { id: ChartService.temporalDetail.hour, label: 'Ora' },
+                { id: ChartService.temporalDetail.dayOfWeek, label: 'Giorno della Settimana' },
+                { id: ChartService.temporalDetail.hourOfDay, label: 'Ora del Giorno' },
             ]
 
 
@@ -67,16 +70,21 @@
             ]
             //$ctrl.selectedCharacteristic = $ctrl.characteristics[0];
 
-            $ctrl.endDate = new Date();
-            $ctrl.startDate = new Date();
-            $ctrl.startDate.setDate(1);
-            $ctrl.selectedTemporalDetail = $ctrl.temporalDetails[0];
+            $ctrl.firstDate = new Date();
+            $ctrl.firstDate.setDate(1);
+            $ctrl.lastDate = new Date();
+            $ctrl.lastDate.setDate(ChartService.daysInMonth[$ctrl.lastDate.getMonth()]);
+            $ctrl.selectedChartType = $ctrl.chartTypes[0];
+            changeChartType();
+            $ctrl.selectedQueryType = $ctrl.queryTypes[0];
+            $ctrl.selectedTemporalDetail = $ctrl.temporalDetails[2];
+            $ctrl.selectedCharacteristic = $ctrl.characteristics[0];
 
             _subscription = StoreTreeService.subscribe(reload);
 
-            //if (StoreTreeService.getContext()) {
-            //    reload();
-            //}
+            if (StoreTreeService.getContext()) {
+                reload();
+            }
         }
 
         function selectSingleCharacteristic() {
@@ -126,7 +134,7 @@
                 delete $ctrl.options['pieceLabel'];
             }
 
-            $ctrl.reload();
+            //$ctrl.reload();
         }
 
         function reload() {
@@ -134,7 +142,6 @@
             var context = StoreTreeService.getContext();
 
             if (!context.store) {
-                //setChartsEmpty($ctrl.charts);
                 return;
             }
 
@@ -152,20 +159,21 @@
                 $ctrl.labels = angular.copy($ctrl.selectedCharacteristic.labels);
             }
             else {
-                $ctrl.labels = ChartService.getLabels($ctrl.startDate, $ctrl.endDate, $ctrl.selectedTemporalDetail.id);
+                $ctrl.labels = ChartService.getLabels($ctrl.firstDate, $ctrl.lastDate, $ctrl.selectedTemporalDetail.id);
             }
-            var dateFilters = ChartService.getFilters($ctrl.startDate, $ctrl.endDate, $ctrl.selectedTemporalDetail.id);
-            var numberOfItems = ChartService.getNumberOfItems($ctrl.startDate, $ctrl.endDate, $ctrl.selectedTemporalDetail.id);
+            var dateFilters = ChartService.getFilters($ctrl.firstDate, $ctrl.lastDate, $ctrl.selectedTemporalDetail.id);
+            var numberOfItems = ChartService.getNumberOfItems($ctrl.firstDate, $ctrl.lastDate, $ctrl.selectedTemporalDetail.id);
             var promiseList = [];
 
             switch ($ctrl.selectedQueryType.id) {
                 case 's':
                     if ($ctrl.selectedChartType.type == 'single') {
                         if ($ctrl.selectedCharacteristic.canGroup) {
-                            promiseList.push(OdataService.getFaces($ctrl.startDate,
-                                context.cameras,
-                                $ctrl.endDate,
-                                false,
+                            promiseList.push(OdataService.getFaces([{
+                                firstDate: $ctrl.firstDate,
+                                lastDate: $ctrl.lastDate
+                            }],
+                                context.cameras,                                
                                 null,
                                 [$ctrl.selectedCharacteristic.id],
                                 { property: 'ID', transformation: 'countdistinct', alias: 'total' }
@@ -181,10 +189,11 @@
                             }, function (error) { $ctrl.loading = false; }))
                         }
                         else {
-                            promiseList.push(OdataService.getFaces($ctrl.startDate,
-                                context.cameras,
-                                $ctrl.endDate,
-                                false,
+                            promiseList.push(OdataService.getFaces([{
+                                firstDate: $ctrl.firstDate,
+                                lastDate: $ctrl.lastDate
+                            }],
+                                context.cameras,                                
                                 null, null, null,
                                 [$ctrl.selectedCharacteristic.id]
                             ).then(function (response) {
@@ -208,10 +217,9 @@
                         if ($ctrl.selectedCharacteristic.canGroup) {
                             dateFilters.map(d => {
                                 var xIndex = d.index;
-                                promiseList.push(OdataService.getFaces(d.firstDate,
-                                    context.cameras,
-                                    d.lastDate,
-                                    false,
+                                promiseList.push(OdataService.getFaces(
+                                    d.dateRangeList,
+                                    context.cameras,                                                                        
                                     null,
                                     [$ctrl.selectedCharacteristic.id],
                                     { property: 'ID', transformation: 'countdistinct', alias: 'total' }
@@ -232,10 +240,9 @@
                         else {
                             dateFilters.map(d => {
                                 var xIndex = d.index;
-                                promiseList.push(OdataService.getFaces(d.firstDate,
-                                    context.cameras,
-                                    d.lastDate,
-                                    false,
+                                promiseList.push(OdataService.getFaces(
+                                    d.dateRangeList,
+                                    context.cameras,                                                                        
                                     null, null, null,
                                     [$ctrl.selectedCharacteristic.id]
                                 ).then(function (response) {
@@ -266,10 +273,9 @@
                     });
                     dateFilters.map(d => {
                         var xIndex = d.index;
-                        promiseList.push(OdataService.getFaces(d.firstDate,
-                            context.cameras,
-                            d.lastDate,
-                            false,
+                        promiseList.push(OdataService.getFaces(
+                            d.dateRangeList,
+                            context.cameras,                                                        
                             null, null, null,
                             selectList
                         ).then(function (response) {
