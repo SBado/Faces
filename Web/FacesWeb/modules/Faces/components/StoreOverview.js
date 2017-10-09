@@ -123,13 +123,14 @@
                 return;
             }
 
-            var today = new Date();
+            $ctrl.today = new Date();
 
             OdataService.getFacesInStore([{
-                firstDateTime: new Date(today.getFullYear(), today.getMonth(), today.getDate())
+                firstDateTime: new Date($ctrl.today.getFullYear(), $ctrl.today.getMonth(), $ctrl.today.getDate())
             }], context.cameras).then(function (response) {
                 if (response.status == 200 && response.data.value.length) {
                     _faces = response.data.value;
+                    $ctrl.totalFaces = response.data.value.length;
 
                     //var males = $filter('filter')(_faces, { Gender: 'M' }).length;                    
                     //var females = _faces.length - males;

@@ -1,5 +1,9 @@
 ﻿<div class="container-fluid">
     <div class="row">
+        <h3>Riepilogo di oggi {{$ctrl.today | date : 'fullDate'}}</h3>
+        <h4>{{$ctrl.totalFaces}} ingressi</h4>
+    </div>
+    <div class="row">
         <div ng-repeat="chart in $ctrl.charts">
             <div class="col-xs-6 col-sm-4">
                 <canvas id="chart.id" class="chart chart-pie chart-xs" chart-data="chart.data" chart-labels="chart.labels" chart-options="chart.options" chart-dataset-override="chart.chartsOverride"></canvas>
