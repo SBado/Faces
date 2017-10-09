@@ -1,6 +1,6 @@
 ﻿<div class="container-fluid">
     <div class="row">
-        <div class="col-sm-3" ng-repeat="camera in $ctrl.cameraList">
+        <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3" ng-repeat="camera in $ctrl.cameraList">
             <camera camera-name="camera.Name" camera-status="camera.Status" camera-color="camera.Color" image-path="camera.ImagePath" today-recorded-faces="camera.TodayRecordedFaces" total-recorded-faces="camera.TotalRecordedFaces"></camera>
         </div>
     </div>

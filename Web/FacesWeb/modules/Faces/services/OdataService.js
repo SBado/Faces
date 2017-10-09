@@ -84,7 +84,7 @@
 
         }
 
-        self.getFaces = function (dateRangeList, cameraList, filter, groupByList, aggregate, selectList) {
+        self.getFaces = function (dateTimeRangeList, cameraList, dateTimeEquality, dateTimeFunction, filter, groupByList, aggregate, selectList) {
             var cameraFilter = '';
             cameraList.map(camera => {
                 if (cameraFilter) {
@@ -96,22 +96,42 @@
                 return createEmptyResponse();
             }
             
-            var dateFilter = '';
-            dateRangeList.map(range => {
-                var firstDate = range.firstDate;
-                var lastDate = range.lastDate;
-                if (lastDate && lastDate < firstDate) {
+            var dateTimeFilter = '';
+            dateTimeRangeList.map(range => {
+                var firstDateTime = range.firstDateTime;
+                var lastDateTime = range.lastDateTime;                
+                if (lastDateTime && lastDateTime < firstDateTime) {
                     return;
+                } 
+                var firstParameter = 'EntranceTimestamp'
+                var lastParameter = 'ExitTimestamp'
+                if (dateTimeFunction) {
+                    firstParameter = dateTimeFunction + '(' + firstParameter + ')';
+                    lastParameter = dateTimeFunction + '(' + lastParameter + ')';
                 }
-                if (dateFilter) {
-                    dateFilter += ' or ';
+                
+                if (dateTimeFilter) {
+                    dateTimeFilter += ' or ';
                 }
-                if (!lastDate) {
-                    dateFilter += '(EntranceTimestamp ge ' + new Date(firstDate.getTime() - (firstDate.getTimezoneOffset() * 60000)).toISOString() + ' and ExitTimestamp eq null)';                    
+                if (!lastDateTime) {
+                    var comparator = dateTimeEquality[0] ? 'ge' : 'gt';
+                    var value = Object.prototype.toString.call(firstDateTime) === "[object Date]" ? 
+                        new Date(firstDateTime.getTime() - (firstDateTime.getTimezoneOffset() * 60000)).toISOString() :
+                        firstDateTime
+                    dateTimeFilter += '(' + firstParameter + ' ' + comparator + ' ' + value + ' and ExitTimestamp eq null)';                    
                 }
                 else {
-                    dateFilter += '(EntranceTimestamp le ' + new Date(lastDate.getTime() - (lastDate.getTimezoneOffset() * 60000)).toISOString();
-                    dateFilter += ' and ExitTimestamp ge ' + new Date(firstDate.getTime() - (firstDate.getTimezoneOffset() * 60000)).toISOString() + ')';
+                    var comparators = [];
+                    comparators.push(dateTimeEquality[0] ? 'le' : 'lt');
+                    comparators.push(dateTimeEquality[1] ? 'ge' : 'gt');
+                    var firstValue = Object.prototype.toString.call(lastDateTime) === "[object Date]" ?
+                        new Date(lastDateTime.getTime() - (lastDateTime.getTimezoneOffset() * 60000)).toISOString() :
+                        lastDateTime
+                    var lastValue = Object.prototype.toString.call(firstDateTime) === "[object Date]" ?
+                        new Date(firstDateTime.getTime() - (firstDateTime.getTimezoneOffset() * 60000)).toISOString() :
+                        firstDateTime
+                    dateTimeFilter += '(' + firstParameter + ' ' + comparators[0] + ' ' + firstValue;
+                    dateTimeFilter += ' and ' + lastParameter + ' ' + comparators[1] + ' ' + lastValue + ')';
 
                 }
             });
@@ -123,17 +143,17 @@
 
 
             if (groupByList && aggregate) {
-                return self.getAllFaces('$apply=filter((' + dateFilter + ') and (' + cameraFilter +
+                return self.getAllFaces('$apply=filter((' + dateTimeFilter + ') and (' + cameraFilter +
                     '))/groupby((' + groupByList.join(',') +
                     '),aggregate(' + aggregate.property +
                     ' with ' + aggregate.transformation +
                     ' as ' + aggregate.alias + '))');
             }
-            return self.getAllFaces('$filter=(' + dateFilter + ') and (' + cameraFilter + ')' + select);
+            return self.getAllFaces('$filter=(' + dateTimeFilter + ') and (' + cameraFilter + ')' + select);
         }
 
-        self.getFacesInStore = function (dateRangeList, cameraList) {
-            return self.getFaces(dateRangeList, cameraList);
+        self.getFacesInStore = function (dateTimeRangeList, cameraList) {
+            return self.getFaces(dateTimeRangeList, cameraList, [true]);
         }
 
         self.getBaskets = function (options) {

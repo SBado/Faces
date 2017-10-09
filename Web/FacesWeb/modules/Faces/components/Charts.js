@@ -13,7 +13,7 @@
         var _subscription = null;
 
         function canLoad() {
-            return $ctrl.firstDate <= $ctrl.lastDate && (($ctrl.selectedQueryType && $ctrl.selectedQueryType.id == 's' && $ctrl.selectedCharacteristic) ||
+            return $ctrl.firstDateTime <= $ctrl.lastDateTime && (($ctrl.selectedQueryType && $ctrl.selectedQueryType.id == 's' && $ctrl.selectedCharacteristic) ||
                 ($ctrl.selectedQueryType && $ctrl.selectedQueryType.id == 'm' && $filter('filter')($ctrl.characteristics, { selected: true }).length));
         }
 
@@ -62,7 +62,7 @@
             $ctrl.characteristics = [
                 //{ id: 'Gender', name: 'Sesso', labels: ['Donne', 'Uomini'], possibleValues: ['F', 'M'], canGroup: true, selected: false },
                 { id: 'Gender', name: 'Sesso', labels: ['Donne', 'Uomini'], possibleValues: [{ values: ['F'], operators: '==' }, { values: ['M'], operators: '==' }], canGroup: true, selected: false },
-                { id: 'Age', name: 'Età', labels: ['0-12', '13-19', '20-60', '60+'], possibleValues: [{ values: [0, 12], operators: '<,<=' }, { values: [12, 19], operators: '<,<=' }, { values: [19, 60], operators: '<,<=' }, { values: [60], operators: '>' }], canGroup: false, selected: false },
+                { id: 'Age', name: 'Età', labels: ['0-10', '10-20', '20-30', '30-40', '40-50', '50-60', '60-70', '70+'], possibleValues: [{ values: [0, 10], operators: '<,<=' }, { values: [10, 20], operators: '<,<=' }, { values: [20, 30], operators: '<,<=' }, { values: [30, 40], operators: '<,<=' }, { values: [40, 50], operators: '<,<=' }, { values: [50, 60], operators: '<,<=' }, { values: [60, 70], operators: '<,<=' }, { values: [70], operators: '>' }], canGroup: false, selected: false },
                 //{ id: 'Eyeglasses', name: 'Occhiali', labels: ['Con occhiali', 'Senza occhiali'], possibleValues: [true, false], canGroup: true, selected: false  },
                 { id: 'Eyeglasses', name: 'Occhiali', labels: ['Con occhiali', 'Senza occhiali'], possibleValues: [{ values: [true], operators: '==' }, { values: [false], operators: '==' }], canGroup: true, selected: false },
                 { id: 'Mustaches', name: 'Baffi', labels: ['Con baffi', 'Senza baffi'], possibleValues: [{ values: [0], operators: '==' }, { values: [0, 1], operators: '<,<=' }], canGroup: false, selected: false },
@@ -70,10 +70,10 @@
             ]
             //$ctrl.selectedCharacteristic = $ctrl.characteristics[0];
 
-            $ctrl.firstDate = new Date();
-            $ctrl.firstDate.setDate(1);
-            $ctrl.lastDate = new Date();
-            $ctrl.lastDate.setDate(ChartService.daysInMonth[$ctrl.lastDate.getMonth()]);
+            $ctrl.firstDateTime = new Date();
+            $ctrl.firstDateTime.setDate(1);
+            $ctrl.lastDateTime = new Date();
+            $ctrl.lastDateTime.setDate(ChartService.daysInMonth[$ctrl.lastDateTime.getMonth()]);
             $ctrl.selectedChartType = $ctrl.chartTypes[0];
             changeChartType();
             $ctrl.selectedQueryType = $ctrl.queryTypes[0];
@@ -159,10 +159,10 @@
                 $ctrl.labels = angular.copy($ctrl.selectedCharacteristic.labels);
             }
             else {
-                $ctrl.labels = ChartService.getLabels($ctrl.firstDate, $ctrl.lastDate, $ctrl.selectedTemporalDetail.id);
+                $ctrl.labels = ChartService.getLabels($ctrl.firstDateTime, $ctrl.lastDateTime, $ctrl.selectedTemporalDetail.id);
             }
-            var dateFilters = ChartService.getFilters($ctrl.firstDate, $ctrl.lastDate, $ctrl.selectedTemporalDetail.id);
-            var numberOfItems = ChartService.getNumberOfItems($ctrl.firstDate, $ctrl.lastDate, $ctrl.selectedTemporalDetail.id);
+            var dateFilters = ChartService.getFilters($ctrl.firstDateTime, $ctrl.lastDateTime, $ctrl.selectedTemporalDetail.id);
+            var numberOfItems = ChartService.getNumberOfItems($ctrl.firstDateTime, $ctrl.lastDateTime, $ctrl.selectedTemporalDetail.id);
             var promiseList = [];
 
             switch ($ctrl.selectedQueryType.id) {
@@ -170,10 +170,12 @@
                     if ($ctrl.selectedChartType.type == 'single') {
                         if ($ctrl.selectedCharacteristic.canGroup) {
                             promiseList.push(OdataService.getFaces([{
-                                firstDate: $ctrl.firstDate,
-                                lastDate: $ctrl.lastDate
+                                firstDateTime: $ctrl.firstDateTime,
+                                lastDateTime: $ctrl.lastDateTime
                             }],
-                                context.cameras,                                
+                                context.cameras,
+                                [true, true],
+                                null,
                                 null,
                                 [$ctrl.selectedCharacteristic.id],
                                 { property: 'ID', transformation: 'countdistinct', alias: 'total' }
@@ -190,11 +192,12 @@
                         }
                         else {
                             promiseList.push(OdataService.getFaces([{
-                                firstDate: $ctrl.firstDate,
-                                lastDate: $ctrl.lastDate
+                                firstDateTime: $ctrl.firstDateTime,
+                                lastDateTime: $ctrl.lastDateTime
                             }],
-                                context.cameras,                                
-                                null, null, null,
+                                context.cameras,
+                                [true, true],
+                                null, null, null, null,
                                 [$ctrl.selectedCharacteristic.id]
                             ).then(function (response) {
                                 //$ctrl.loading = false;
@@ -219,7 +222,9 @@
                                 var xIndex = d.index;
                                 promiseList.push(OdataService.getFaces(
                                     d.dateRangeList,
-                                    context.cameras,                                                                        
+                                    context.cameras,
+                                    d.dateTimeEquality,
+                                    d.dateTimeFunction,
                                     null,
                                     [$ctrl.selectedCharacteristic.id],
                                     { property: 'ID', transformation: 'countdistinct', alias: 'total' }
@@ -243,6 +248,8 @@
                                 promiseList.push(OdataService.getFaces(
                                     d.dateRangeList,
                                     context.cameras,                                                                        
+                                    d.dateTimeEquality,
+                                    d.dateTimeFunction,
                                     null, null, null,
                                     [$ctrl.selectedCharacteristic.id]
                                 ).then(function (response) {
@@ -275,7 +282,9 @@
                         var xIndex = d.index;
                         promiseList.push(OdataService.getFaces(
                             d.dateRangeList,
-                            context.cameras,                                                        
+                            context.cameras,
+                            d.dateTimeEquality,
+                            d.dateTimeFunction,
                             null, null, null,
                             selectList
                         ).then(function (response) {

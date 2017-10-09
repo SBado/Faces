@@ -103,11 +103,11 @@
         
 
 
-        function getNumberOfMonths(firstDate, lastDate) {
-            var startMonth = firstDate.getMonth();
-            var startYear = firstDate.getFullYear();
-            var endMonth = lastDate.getMonth();
-            var endYear = lastDate.getFullYear();
+        function getNumberOfMonths(firstDateTime, lastDateTime) {
+            var startMonth = firstDateTime.getMonth();
+            var startYear = firstDateTime.getFullYear();
+            var endMonth = lastDateTime.getMonth();
+            var endYear = lastDateTime.getFullYear();
 
             if (startYear == endYear) {
                 if (endMonth >= startMonth) {
@@ -124,10 +124,10 @@
 
         }
 
-        function loopMonths (firstDate, numberOfMonths, fn, param) {            
+        function loopMonths (firstDateTime, numberOfMonths, fn, param) {            
             var loopNumber = 0;
-            var year = firstDate.getFullYear();
-            var lastSelectedMonth = firstDate.getMonth();                     
+            var year = firstDateTime.getFullYear();
+            var lastSelectedMonth = firstDateTime.getMonth();                     
             for (var month = lastSelectedMonth; month < 13; month = (month + 1) % 12) {
                 if (lastSelectedMonth > month) {
                     year++;
@@ -147,48 +147,41 @@
             labelList.push(months[date.getMonth()] + ' ' + date.getFullYear());
         }
 
-        function createMonthFilter(filterList, firstDate, index) {
-            var lastDate = angular.copy(firstDate);
-            lastDate.setDate(daysInMonth[lastDate.getMonth()]);
-            lastDate.setHours(23, 59, 59, 999);
+        function createMonthFilter(filterList, firstDateTime, index) {
+            var lastDateTime = angular.copy(firstDateTime);
+            lastDateTime.setDate(daysInMonth[lastDateTime.getMonth()]);
+            lastDateTime.setHours(23, 59, 59, 999);
             filterList.push({
                 index: index,
                 dateRangeList: [
                     {
-                        firstDate: firstDate,
-                        lastDate: lastDate,
+                        firstDateTime: firstDateTime,
+                        lastDateTime: lastDateTime,
                     }
-                ]
-                //year: year,
-                //months: [month, month],
-                //firstDay: 1,
-                //lastDay: daysInMonth[month],
-                //firstHour: 0,
-                //firstMinute: 0,
-                //lastHour: 23,
-                //lastMinute: 59
+                ],
+                dateTimeEquality: [true, true]
             })
         }
 
-        function getMonthLabels(firstDate, lastDate) {
+        function getMonthLabels(firstDateTime, lastDateTime) {
             var labelList = [];
-            loopMonths(firstDate, getNumberOfMonths(firstDate, lastDate), createMonthLabel, labelList);
+            loopMonths(firstDateTime, getNumberOfMonths(firstDateTime, lastDateTime), createMonthLabel, labelList);
             return labelList;
         }
 
-        function getMonthFilters(firstDate, lastDate) {
+        function getMonthFilters(firstDateTime, lastDateTime) {
             var dateFilters = [];
-            loopMonths(firstDate, getNumberOfMonths(firstDate, lastDate), createMonthFilter, dateFilters);
+            loopMonths(firstDateTime, getNumberOfMonths(firstDateTime, lastDateTime), createMonthFilter, dateFilters);
             return dateFilters;
         }
 
 
 
-        function getNumberOfWeeks(firstDate, lastDate) {
-            var startWeek = getWeekNumber(firstDate);
-            var startYear = firstDate.getFullYear();
-            var endWeek = getWeekNumber(lastDate);
-            var endYear = lastDate.getFullYear();
+        function getNumberOfWeeks(firstDateTime, lastDateTime) {
+            var startWeek = getWeekNumber(firstDateTime);
+            var startYear = firstDateTime.getFullYear();
+            var endWeek = getWeekNumber(lastDateTime);
+            var endYear = lastDateTime.getFullYear();
 
             if (startYear == endYear) {
                 return endWeek - startWeek + 1;
@@ -207,11 +200,11 @@
 
         }
 
-        function loopWeeks(firstDate, numberOfWeeks, fn, param) {
+        function loopWeeks(firstDateTime, numberOfWeeks, fn, param) {
             var loopNumber = 0;
-            var year = firstDate.getFullYear();
+            var year = firstDateTime.getFullYear();
             var weeksForYear = weeksInYear(year);
-            var lastSelectedWeek = getWeekNumber(firstDate);
+            var lastSelectedWeek = getWeekNumber(firstDateTime);
             for (var week = lastSelectedWeek; week <= weeksForYear; week = ((week + 1) % (weeksForYear + 1))) {
                 if (week == 0) {
                     week = 1;
@@ -234,18 +227,18 @@
         function createWeekLabel(labelList, date) {
             var monthLabel = '';
             var yearLabel = '';
-            var lastDate = angular.copy(date);
-            lastDate.setDate(lastDate.getDate() + 6);
+            var lastDateTime = angular.copy(date);
+            lastDateTime.setDate(lastDateTime.getDate() + 6);
 
             var firstMonth = date.getMonth();
-            var lastMonth = lastDate.getMonth();
+            var lastMonth = lastDateTime.getMonth();
             monthLabel = months[firstMonth]
             if (firstMonth != lastMonth) {
                 monthLabel += '/' + months[lastMonth];
             }
 
             var firstYear = date.getFullYear();
-            var lastYear = lastDate.getFullYear();
+            var lastYear = lastDateTime.getFullYear();
             yearLabel = firstYear
             if (firstYear != lastYear) {
                 yearLabel += '/' + lastYear;
@@ -255,57 +248,50 @@
             labelList.push(yearLabel + '-' + getWeekNumber(date));
         }
 
-        function createWeekFilter(filterList, firstDate, index) {
-            var lastDate = angular.copy(firstDate);
-            lastDate.setDate(lastDate.getDate() + 6);
+        function createWeekFilter(filterList, firstDateTime, index) {
+            var lastDateTime = angular.copy(firstDateTime);
+            lastDateTime.setDate(lastDateTime.getDate() + 6);
             //if (monthList.length == 1) {
             //    monthList.push(monthList[0]);
             //}
-            lastDate.setHours(23, 59, 59, 999);
+            lastDateTime.setHours(23, 59, 59, 999);
 
             filterList.push({
                 index: index,
                 dateRangeList: [
                     {
-                        firstDate: firstDate,
-                        lastDate: lastDate,
+                        firstDateTime: firstDateTime,
+                        lastDateTime: lastDateTime,
                     }
-                ]
-                //year: year,                
-                //months: monthList,
-                //firstDay: date.getDate(),
-                //lastDay: lastDate.getDate(),
-                //firstHour: 0,
-                //firstMinute: 0,
-                //lastHour: 23,
-                //lastMinute: 59
+                ],
+                dateTimeEquality: [true, true]                
             })
         }
 
-        function getWeekLabels(firstDate, lastDate) {
+        function getWeekLabels(firstDateTime, lastDateTime) {
             var labelList = [];
-            loopWeeks(firstDate, getNumberOfWeeks(firstDate, lastDate), createWeekLabel, labelList);
+            loopWeeks(firstDateTime, getNumberOfWeeks(firstDateTime, lastDateTime), createWeekLabel, labelList);
             return labelList;
         }
 
-        function getWeekFilters(firstDate, lastDate) {
+        function getWeekFilters(firstDateTime, lastDateTime) {
             var dateFilters = [];
-            loopWeeks(firstDate, getNumberOfWeeks(firstDate, lastDate), createWeekFilter, dateFilters);
+            loopWeeks(firstDateTime, getNumberOfWeeks(firstDateTime, lastDateTime), createWeekFilter, dateFilters);
             return dateFilters;
         }
 
 
 
-        function getNumberOfDays(firstDate, lastDate) {
-            return Math.round((lastDate - firstDate) / (1000 * 60 * 60 * 24)) + 1;
+        function getNumberOfDays(firstDateTime, lastDateTime) {
+            return Math.round((lastDateTime - firstDateTime) / (1000 * 60 * 60 * 24)) + 1;
         }
 
-        function loopDays(firstDate, numberOfDays, fn, param) {
+        function loopDays(firstDateTime, numberOfDays, fn, param) {
             var loopNumber = 0;
-            var year = firstDate.getFullYear();
-            var month = firstDate.getMonth();
+            var year = firstDateTime.getFullYear();
+            var month = firstDateTime.getMonth();
             var lastSelectedMonth = month;
-            var lastSelectedDay = firstDate.getDate();
+            var lastSelectedDay = firstDateTime.getDate();
             for (var day = lastSelectedDay; day <= daysInMonth[month]; day = (day + 1) % (daysInMonth[month] + 1)) {
                 if (!day) {
                     day = 1;
@@ -334,154 +320,46 @@
             labelList.push(daysOfWeek[date.getDay()] + ' ' + date.getDate() + ' ' + months[date.getMonth()] + ' ' + date.getFullYear());
         }
 
-        function createDayFilter(filterList, firstDate, index) {
-            var lastDate = angular.copy(firstDate);
-            lastDate.setHours(23, 59, 59, 999);
+        function createDayFilter(filterList, firstDateTime, index) {
+            var lastDateTime = angular.copy(firstDateTime);
+            lastDateTime.setHours(23, 59, 59, 999);
             filterList.push({
                 index: index,
                 dateRangeList: [
                     {
-                        firstDate: firstDate,
-                        lastDate: lastDate,
+                        firstDateTime: firstDateTime,
+                        lastDateTime: lastDateTime,
                     }
-                ]
+                ],
+                dateTimeEquality: [true, true]
             })
         }
 
-        function getDayLabels(firstDate, lastDate) {
+        function getDayLabels(firstDateTime, lastDateTime) {
             var labelList = [];
-            loopDays(firstDate, getNumberOfDays(firstDate, lastDate), createDayLabel, labelList);
+            loopDays(firstDateTime, getNumberOfDays(firstDateTime, lastDateTime), createDayLabel, labelList);
             return labelList;
         }
 
-        function getDayFilters(firstDate, lastDate) {
+        function getDayFilters(firstDateTime, lastDateTime) {
             var dateFilters = [];
-            loopDays(firstDate, getNumberOfDays(firstDate, lastDate), createDayFilter, dateFilters);
+            loopDays(firstDateTime, getNumberOfDays(firstDateTime, lastDateTime), createDayFilter, dateFilters);
             return dateFilters;
         }
 
 
 
-        function getNumberOfDaysOfWeek() {
-            return 7;
+        function getNumberOfHours(firstDateTime, lastDateTime) {
+            return 24 + Math.floor(Math.abs(lastDateTime - firstDateTime) / 3.6e6);
         }
 
-        function getDatesForDaysOfWeek(firstDate, numberOfDays) {
-            var days = new Array();
-            for (var i = 0; i < 7; i++) {
-                days.push(new Array());
-            }
-
-            loopDays(firstDate, numberOfDays, function (days, date, index) {
-                var dayOfWeek = date.getDay();
-                days[dayOfWeek].push(date);
-            }, days);
-
-            return days;
-        }
-
-        function getDaysOfWeekLabels() {
-            return ['Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato', 'Domenica'];
-        }
-
-        function getDaysOfWeekFilters(firstDate, lastDate) {
-            var numberOfDays = getNumberOfDays(firstDate, lastDate);
-            var dateMatrix = getDatesForDaysOfWeek(firstDate, numberOfDays);
-            var filterList = [];
-            var index = 6;
-
-            dateMatrix.map(dateList => {
-                var filter = {
-                    index: index,
-                    dateRangeList: []
-                };
-
-                dateList.map(firstDate => {
-                    var lastDate = angular.copy(firstDate);
-                    lastDate.setHours(23, 59, 59, 999);
-
-                    filter.dateRangeList.push({
-                        firstDate: firstDate,
-                        lastDate: lastDate
-                    });
-                });
-
-                filterList.push(filter);
-                index = (index + 1) % 7;
-            });
-
-            filterList.push(filterList.shift()); //Altrimenti partiamo da Domenica
-            return filterList;
-        }
-
-
-
-        function getNumberOfHoursOfDay() {
-            return 24;
-        }
-
-        function getDatesForHoursOfDay(firstDate, numberOfHours) {
-            var hours = new Array();
-            for (var i = 0; i < 24; i++) {
-                hours.push(new Array());
-            }
-
-            loopHours(firstDate, numberOfHours, function (hours, date, index) {
-                var hourOfDay = date.getHours();
-                hours[hourOfDay].push(date);
-            }, hours);
-
-            return hours;
-        }
-
-        function getHoursOfDayLabels() {
-            return ['0-1', '1-2', '2-3', '3-4', '4-5', '5-6', '6-7', '7-8', '8-9',
-                '9-10', '10-11', '11-12', '12-13', '13-14', '14-15', '15-16', '16-17',
-                '17-18', '18-19', '19-20', '20-21', '21-22', '22-23', '23-24'];
-        }
-
-        function getHoursOfDayFilters(firstDate, lastDate) {
-            var numberOfHours = getNumberOfHours(firstDate, lastDate);
-            var dateMatrix = getDatesForHoursOfDay(firstDate, numberOfHours);
-            var filterList = [];
-            var index = 0;
-
-            dateMatrix.map(dateList => {
-                var filter = {
-                    index: index,
-                    dateRangeList: []
-                };
-
-                dateList.map(firstDate => {
-                    var lastDate = angular.copy(firstDate);
-                    lastDate.setMinutes(59, 59, 999);
-
-                    filter.dateRangeList.push({
-                        firstDate: firstDate,
-                        lastDate: lastDate
-                    });
-                });
-
-                filterList.push(filter);
-                index++;
-            });
-
-            return filterList;
-        }
-
-
-
-        function getNumberOfHours(firstDate, lastDate) {
-            return 24 + Math.floor(Math.abs(lastDate - firstDate) / 3.6e6);
-        }
-
-        function loopHours(firstDate, numberOfHours, fn, param) {
+        function loopHours(firstDateTime, numberOfHours, fn, param) {
             var loopNumber = 0;
-            var year = firstDate.getFullYear();
-            var month = firstDate.getMonth();
-            var day = firstDate.getDate();
+            var year = firstDateTime.getFullYear();
+            var month = firstDateTime.getMonth();
+            var day = firstDateTime.getDate();
             var lastSelectedMonth = month;
-            var lastSelectedDay = firstDate.getDate();
+            var lastSelectedDay = firstDateTime.getDate();
             var lastSelectedHour = 0;
             for (var hour = lastSelectedHour; hour <= 23; hour = (hour + 1) % (24)) {
                 if (lastSelectedHour > hour) {
@@ -511,30 +389,162 @@
             labelList.push(daysOfWeek[date.getDay()] + ' ' + date.getDate() + ' ' + months[date.getMonth()] + ' ' + date.getFullYear() + ' ' + date.getHours() + ':00');
         }
 
-        function createHourFilter(filterList, firstDate, index) {
-            var lastDate = angular.copy(firstDate);
-            lastDate.setMinutes(59, 59, 999);
+        function createHourFilter(filterList, firstDateTime, index) {
+            var lastDateTime = angular.copy(firstDateTime);
+            lastDateTime.setMinutes(59, 59, 999);
             filterList.push({
                 index: index,
                 dateRangeList: [
                     {
-                        firstDate: firstDate,
-                        lastDate: lastDate,
+                        firstDateTime: firstDateTime,
+                        lastDateTime: lastDateTime,
                     }
-                ]
+                ],
+                dateTimeEquality: [true, true]
             })
         }
 
-        function getHourLabels(firstDate, lastDate) {
+        function getHourLabels(firstDateTime, lastDateTime) {
             var labelList = [];
-            loopHours(firstDate, getNumberOfHours(firstDate, lastDate), createHourLabel, labelList);
+            loopHours(firstDateTime, getNumberOfHours(firstDateTime, lastDateTime), createHourLabel, labelList);
             return labelList;
         }
 
-        function getHourFilters(firstDate, lastDate) {
+        function getHourFilters(firstDateTime, lastDateTime) {
             var dateFilters = [];
-            loopHours(firstDate, getNumberOfHours(firstDate, lastDate), createHourFilter, dateFilters);
+            loopHours(firstDateTime, getNumberOfHours(firstDateTime, lastDateTime), createHourFilter, dateFilters);
             return dateFilters;
+        }
+
+
+
+        function getNumberOfDaysOfWeek() {
+            return 7;
+        }
+
+        function getDatesForDaysOfWeek(firstDateTime, numberOfDays) {
+            var days = new Array();
+            for (var i = 0; i < 7; i++) {
+                days.push(new Array());
+            }
+
+            loopDays(firstDateTime, numberOfDays, function (days, date, index) {
+                var dayOfWeek = date.getDay();
+                days[dayOfWeek].push(date);
+            }, days);
+
+            return days;
+        }
+
+        function getDaysOfWeekLabels() {
+            return ['Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato', 'Domenica'];
+        }
+
+        function getDaysOfWeekFilters(firstDateTime, lastDateTime) {
+            var numberOfDays = getNumberOfDays(firstDateTime, lastDateTime);
+            var dateMatrix = getDatesForDaysOfWeek(firstDateTime, numberOfDays);
+            var filterList = [];
+            var index = 6;
+
+            dateMatrix.map(dateList => {
+                var filter = {
+                    index: index,
+                    dateRangeList: [],
+                    dateTimeEquality: [true, true]
+                };
+
+                dateList.map(firstDateTime => {
+                    var lastDateTime = angular.copy(firstDateTime);
+                    lastDateTime.setHours(23, 59, 59, 999);
+
+                    filter.dateRangeList.push({
+                        firstDateTime: firstDateTime,
+                        lastDateTime: lastDateTime
+                    });
+                });
+
+                filterList.push(filter);
+                index = (index + 1) % 7;
+            });
+
+            filterList.push(filterList.shift()); //Altrimenti partiamo da Domenica
+            return filterList;
+        }
+
+
+
+        function getNumberOfHoursOfDay() {
+            return 24;
+        }
+
+        function getDatesForHoursOfDay(firstDateTime, numberOfHours) {
+            var hours = new Array();
+            for (var i = 0; i < 24; i++) {
+                hours.push(new Array());
+            }
+
+            loopHours(firstDateTime, numberOfHours, function (hours, date, index) {
+                var hourOfDay = date.getHours();
+                hours[hourOfDay].push(date);
+            }, hours);
+
+            return hours;
+        }
+
+        function getHoursOfDayLabels() {
+            return ['0-1', '1-2', '2-3', '3-4', '4-5', '5-6', '6-7', '7-8', '8-9',
+                '9-10', '10-11', '11-12', '12-13', '13-14', '14-15', '15-16', '16-17',
+                '17-18', '18-19', '19-20', '20-21', '21-22', '22-23', '23-24'];
+        }
+
+        function _getHoursOfDayFilters(firstDateTime, lastDateTime) {
+            var numberOfHours = getNumberOfHours(firstDateTime, lastDateTime);
+            var dateMatrix = getDatesForHoursOfDay(firstDateTime, numberOfHours);
+            var filterList = [];
+            var index = 0;
+
+            dateMatrix.map(dateList => {
+                var filter = {
+                    index: index,
+                    dateRangeList: []
+                };
+
+                dateList.map(firstDateTime => {
+                    var lastDateTime = angular.copy(firstDateTime);
+                    lastDateTime.setMinutes(59, 59, 999);
+
+                    filter.dateRangeList.push({
+                        firstDateTime: firstDateTime,
+                        lastDateTime: lastDateTime
+                    });
+                });
+
+                filterList.push(filter);
+                index++;
+            });
+
+            return filterList;
+        }
+
+        function getHoursOfDayFilters(firstDateTime, lastDateTime) {
+            var filterList = [];
+            for (var index = 0; index < 24; index++) {
+                var filter = {
+                    index: index,                    
+                    dateRangeList: [],
+                    dateTimeFunction: 'hour',
+                    dateTimeEquality: [true, false]
+                };
+
+                filter.dateRangeList.push({
+                    firstDateTime: index,
+                    lastDateTime: index + 1
+                });
+
+                filterList.push(filter);
+            }                     
+
+            return filterList;
         }
 
 
@@ -618,19 +628,19 @@
             return counts;
         }
 
-        self.getLabels = function (firstDate, lastDate, temporalDetail) {
+        self.getLabels = function (firstDateTime, lastDateTime, temporalDetail) {
             switch (temporalDetail) {
                 case self.temporalDetail.month:
-                    return getMonthLabels(firstDate, lastDate);
+                    return getMonthLabels(firstDateTime, lastDateTime);
                     break;
                 case self.temporalDetail.week:
-                    return getWeekLabels(firstDate, lastDate);
+                    return getWeekLabels(firstDateTime, lastDateTime);
                     break;
                 case self.temporalDetail.day:
-                    return getDayLabels(firstDate, lastDate);
+                    return getDayLabels(firstDateTime, lastDateTime);
                     break;
                 case self.temporalDetail.hour:
-                    return getHourLabels(firstDate, lastDate);
+                    return getHourLabels(firstDateTime, lastDateTime);
                     break;
                 case self.temporalDetail.dayOfWeek:
                     return getDaysOfWeekLabels();
@@ -641,42 +651,42 @@
             }                  
         }
 
-        self.getFilters = function (firstDate, lastDate, temporalDetail) {
+        self.getFilters = function (firstDateTime, lastDateTime, temporalDetail) {
             switch (temporalDetail) {
                 case self.temporalDetail.month:
-                    return getMonthFilters(firstDate, lastDate);
+                    return getMonthFilters(firstDateTime, lastDateTime);
                     break;
                 case self.temporalDetail.week:
-                    return getWeekFilters(firstDate, lastDate);
+                    return getWeekFilters(firstDateTime, lastDateTime);
                     break; 
                 case self.temporalDetail.day:
-                    return getDayFilters(firstDate, lastDate);
+                    return getDayFilters(firstDateTime, lastDateTime);
                     break;
                 case self.temporalDetail.hour:
-                    return getHourFilters(firstDate, lastDate);
+                    return getHourFilters(firstDateTime, lastDateTime);
                     break;
                 case self.temporalDetail.dayOfWeek:
-                    return getDaysOfWeekFilters(firstDate, lastDate);
+                    return getDaysOfWeekFilters(firstDateTime, lastDateTime);
                     break;
                 case self.temporalDetail.hourOfDay:
-                    return getHoursOfDayFilters(firstDate, lastDate);
+                    return getHoursOfDayFilters(firstDateTime, lastDateTime);
                     break;
             }
         }
 
-        self.getNumberOfItems = function (firstDate, lastDate, temporalDetail) {
+        self.getNumberOfItems = function (firstDateTime, lastDateTime, temporalDetail) {
             switch (temporalDetail) {
                 case self.temporalDetail.month:
-                    return getNumberOfMonths(firstDate, lastDate);
+                    return getNumberOfMonths(firstDateTime, lastDateTime);
                     break;
                 case self.temporalDetail.week:
-                    return getNumberOfWeeks(firstDate, lastDate);
+                    return getNumberOfWeeks(firstDateTime, lastDateTime);
                     break;
                 case self.temporalDetail.day:
-                    return getNumberOfDays(firstDate, lastDate);
+                    return getNumberOfDays(firstDateTime, lastDateTime);
                     break;                
                 case self.temporalDetail.hour:
-                    return getNumberOfHours(firstDate, lastDate);
+                    return getNumberOfHours(firstDateTime, lastDateTime);
                     break;
                 case self.temporalDetail.dayOfWeek:
                     return getNumberOfDaysOfWeek();

@@ -58,16 +58,16 @@
             };
             $ctrl.charts['Age'] = {
                 id: 'age',
-                labels: ['0-12', '13-19', '20-60', '60+'],
+                labels: ['0-10', '10-20', '20-30', '30-40', '40-50', '50-60', '60-70', '70+'],
             };
-            $ctrl.charts['Glasses'] = {
-                id: 'glasses',
-                labels: ['Con Occhiali', 'Senza Occhiali'],
-            };
-            $ctrl.charts['Beard'] = {
-                id: 'beard',
-                labels: ['Barba', 'Baffi', 'Niente'],
-            };
+            //$ctrl.charts['Glasses'] = {
+            //    id: 'glasses',
+            //    labels: ['Con Occhiali', 'Senza Occhiali'],
+            //};
+            //$ctrl.charts['Beard'] = {
+            //    id: 'beard',
+            //    labels: ['Barba', 'Baffi', 'Niente'],
+            //};
 
             angular.forEach($ctrl.charts, function (chart) {
                 chart.emptyLabel = ['Nessun dato'];
@@ -79,8 +79,8 @@
 
             $ctrl.charts.Sex.options.title.text = 'Sesso';
             $ctrl.charts.Age.options.title.text = 'Età';
-            $ctrl.charts.Glasses.options.title.text = 'Occhiali';
-            $ctrl.charts.Beard.options.title.text = 'Barba';
+            //$ctrl.charts.Glasses.options.title.text = 'Occhiali';
+            //$ctrl.charts.Beard.options.title.text = 'Barba';
 
             if (StoreTreeService.getContext()) {
                 reload();
@@ -126,7 +126,7 @@
             var today = new Date();
 
             OdataService.getFacesInStore([{
-                firstDate: new Date(today.getFullYear(), today.getMonth(), today.getDate())
+                firstDateTime: new Date(today.getFullYear(), today.getMonth(), today.getDate())
             }], context.cameras).then(function (response) {
                 if (response.status == 200 && response.data.value.length) {
                     _faces = response.data.value;
@@ -153,8 +153,8 @@
                     var elders = $filter('filter')(_faces, UtilityService.greaterThanPredicate('Age', 60)).length;
 
                     setChartValues($ctrl.charts.Sex, [males, females]);
-                    setChartValues($ctrl.charts.Glasses, [glasses, noGlasses]);
-                    setChartValues($ctrl.charts.Beard, [beard, mustaches, nothing]);
+                    //setChartValues($ctrl.charts.Glasses, [glasses, noGlasses]);
+                    //setChartValues($ctrl.charts.Beard, [beard, mustaches, nothing]);
                     setChartValues($ctrl.charts.Age, [children, teens, adults, elders]);
                 }
                 else {
