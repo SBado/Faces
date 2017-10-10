@@ -221,10 +221,9 @@
                             dateFilters.map(d => {
                                 var xIndex = d.index;
                                 promiseList.push(OdataService.getFaces(
-                                    d.dateRangeList,
+                                    d.dateTimeRangeList,
                                     context.cameras,
-                                    d.dateTimeEquality,
-                                    d.dateTimeFunction,
+                                    d.dateTimeEquality,                                    
                                     null,
                                     [$ctrl.selectedCharacteristic.id],
                                     { property: 'ID', transformation: 'countdistinct', alias: 'total' }
@@ -246,10 +245,9 @@
                             dateFilters.map(d => {
                                 var xIndex = d.index;
                                 promiseList.push(OdataService.getFaces(
-                                    d.dateRangeList,
+                                    d.dateTimeRangeList,
                                     context.cameras,                                                                        
-                                    d.dateTimeEquality,
-                                    d.dateTimeFunction,
+                                    d.dateTimeEquality,                                    
                                     null, null, null,
                                     [$ctrl.selectedCharacteristic.id]
                                 ).then(function (response) {
@@ -281,10 +279,9 @@
                     dateFilters.map(d => {
                         var xIndex = d.index;
                         promiseList.push(OdataService.getFaces(
-                            d.dateRangeList,
+                            d.dateTimeRangeList,
                             context.cameras,
-                            d.dateTimeEquality,
-                            d.dateTimeFunction,
+                            d.dateTimeEquality,                            
                             null, null, null,
                             selectList
                         ).then(function (response) {

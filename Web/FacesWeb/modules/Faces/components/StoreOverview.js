@@ -7,8 +7,8 @@
             controller: StoreOverviewController
         });
 
-    function StoreOverviewController($scope, $filter, StoreTreeService, OdataService, UtilityService) {
-        var $ctrl = this;        
+    function StoreOverviewController($q, $scope, $filter, StoreTreeService, ChartService, OdataService, UtilityService) {
+        var $ctrl = this;
         var _subscription = null;
         var _locations = {};
         var _cameras = {};
@@ -82,10 +82,16 @@
             //$ctrl.charts.Glasses.options.title.text = 'Occhiali';
             //$ctrl.charts.Beard.options.title.text = 'Barba';
 
+            $ctrl.todayFaces = 0;
+            $ctrl.facesInStoreCount = 0;
+            $ctrl.maxAffluenceHour = null;
+            $ctrl.malesCount = 0;
+            $ctrl.femalesCount = 0;
+
             if (StoreTreeService.getContext()) {
                 reload();
             }
-        }        
+        }
 
         function setChartEmpty(chart) {
             if (!chart.dataLabels) {
@@ -124,19 +130,20 @@
             }
 
             $ctrl.today = new Date();
+            $ctrl.today.setHours(0, 0, 0, 0);            
 
-            OdataService.getFacesInStore([{
-                firstDateTime: new Date($ctrl.today.getFullYear(), $ctrl.today.getMonth(), $ctrl.today.getDate())
-            }], context.cameras).then(function (response) {
+            OdataService.getFacesInStore(context.cameras).then(function (response) {
                 if (response.status == 200 && response.data.value.length) {
                     _faces = response.data.value;
-                    $ctrl.totalFaces = response.data.value.length;
+                    $ctrl.facesInStoreCount = response.data.value.length;
 
                     //var males = $filter('filter')(_faces, { Gender: 'M' }).length;                    
                     //var females = _faces.length - males;
                     var sexes = $filter('countBy')(_faces, 'Gender');
                     var males = sexes.M;
+                    $ctrl.malesCount = males;
                     var females = sexes.F;
+                    $ctrl.femalesCount = females;
 
                     //var glasses = $filter('filter')(_faces, { Eyeglasses: true }).length;
                     //var noGlasses = _faces.length - glasses;
@@ -146,7 +153,7 @@
 
                     var beard = $filter('filter')(_faces, UtilityService.greaterThanPredicate('Beard', 0)).length;
                     var mustaches = $filter('filter')(_faces, UtilityService.greaterThanPredicate('Mustaches', 0)).length;
-                    var nothing = _faces.length > (beard + mustaches) ? _faces.length - (beard + mustaches) : 0;                    
+                    var nothing = _faces.length > (beard + mustaches) ? _faces.length - (beard + mustaches) : 0;
 
                     var children = $filter('filter')(_faces, UtilityService.lessThanPredicate('Age', 12, true)).length;
                     var teens = $filter('filter')(_faces, UtilityService.betweenPredicate('Age', 12, 19, false, true)).length;
@@ -159,10 +166,69 @@
                     setChartValues($ctrl.charts.Age, [children, teens, adults, elders]);
                 }
                 else {
+                    $ctrl.facesInStoreCount = 0;
+                    $ctrl.malesCount = 0;
+                    $ctrl.femalesCount = 0;
                     setChartsEmpty($ctrl.charts);
                 }
             }, function (error) {
             });
+
+            //var firstDateTime = new Date($ctrl.today.getFullYear(), $ctrl.today.getMonth(), $ctrl.today.getDate())
+            //var lastDateTime = firstDateTime.setHours(23, 59, 59, 999);
+            var dateFilters = ChartService.getTodayFilter();            
+
+            var promiseList = [];
+            dateFilters.map(d => {                
+                promiseList.push(OdataService.getFaces(
+                    d.dateTimeRangeList,
+                    context.cameras,
+                    d.dateTimeEquality,                    
+                    null,
+                    null,
+                    null,
+                    null,
+                    true
+                ).then(function (response) {                    
+                    if (response.status == 200) {
+                        $ctrl.todayFaces = response.data; 
+                    }
+                    else {
+                        $ctrl.todayFaces = 0;           
+                    }
+                }, function (error) { }))
+            });
+
+            var facesAtHour = new Array(24);
+            var firstDateTime = $ctrl.today;
+            var lastDateTime = angular.copy(firstDateTime);
+            lastDateTime.setHours(23, 59, 59, 999);
+            dateFilters = ChartService.getFilters(firstDateTime, lastDateTime, ChartService.temporalDetail.hourOfDay);            
+            promiseList = [];
+            dateFilters.map(d => {
+                var index = d.index;
+                promiseList.push(OdataService.getFaces(
+                    d.dateTimeRangeList,
+                    context.cameras,
+                    d.dateTimeEquality,                    
+                    null,
+                    null,
+                    null,
+                    null,
+                    true
+                ).then(function (response) {                    
+                    if (response.status == 200) {
+                        facesAtHour[index] = response.data
+                    }
+                    else {                        
+                    }
+                }, function (error) { }))
+            });
+
+            $q.all(promiseList).then(function () {
+                var maxIndex = facesAtHour.indexOf(Math.max(...facesAtHour).toString());
+                $ctrl.maxAffluenceHour = maxIndex.toString() + ':00-' + (maxIndex + 1).toString() + ':00';
+            }, function (error) { $ctrl.maxAffluenceHour = null; });
         }
 
         function clean() {

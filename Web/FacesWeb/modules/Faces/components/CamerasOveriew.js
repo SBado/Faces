@@ -43,9 +43,13 @@
                             });
                         });
 
-                        $ctrl.cameraList[$ctrl.cameraList.length - 1].Status = 'Offline'
-                        $ctrl.cameraList[$ctrl.cameraList.length - 1].Color = 'red'
-                        $ctrl.cameraList[$ctrl.cameraList.length - 1].ImagePath = [_imagesBasePath, 'videocam_red.svg'].join('/'),
+                        var offlineIndex = $ctrl.cameraList.findIndex(c => c.Name == 'Uscita 2');
+                        if (offlineIndex != -1) {
+                            var offlineCamera = $ctrl.cameraList[offlineIndex];
+                            offlineCamera.Status = 'Offline';
+                            offlineCamera.Color = 'red';
+                            offlineCamera.ImagePath = [_imagesBasePath, 'videocam_red.svg'].join('/');
+                        } 
 
                         OdataService.getCamerasFacesCount(context.cameras, new Date())
                             .then(function (response) {
@@ -57,10 +61,10 @@
                                     });
                                 }
                             }, function (error) {
-                            });
+                            });                        
                     }
                 }, function (error) {
-                });
+                });                
         }
 
         function clean() {

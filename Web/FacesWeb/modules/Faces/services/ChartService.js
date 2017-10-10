@@ -37,7 +37,7 @@
             return week == 1 ? getWeekNumber(d.setDate(24))[1] : week;
         }
         ////
-        */
+        */        
 
         // https://stackoverflow.com/a/19570985 //
         function isLeapYear(y) { return !((y % 4) || (!(y % 100) && (y % 400))); };
@@ -100,7 +100,30 @@
             }
             return monthList;
         }
-        
+
+
+        function isTodayIncluded(firstDateTime, lastDateTime) {
+            var todayStart = new Date();
+            todayStart.setHours(0, 0, 0, 0);
+            var todayEnd = new Date();
+            todayEnd.setHours(23, 59, 59, 999);
+
+            return lastDateTime.getTime() >= todayStart.getTime() && firstDateTime.getTime() <= todayEnd.getTime();
+        }
+
+        function addDateTimeRangeToFilter(dateTimeFilter, firstDateTime, lastDateTime, dateTimeFunction) {
+            dateTimeFilter.dateTimeRangeList.push({
+                firstDateTime: firstDateTime,
+                lastDateTime: lastDateTime,
+                dateTimeFunction: dateTimeFunction
+            });
+        }
+
+        function addInStoreFilter(dateTimeFilter) {
+            var today = new Date();
+            today.setHours(0, 0, 0, 0);            
+            addDateTimeRangeToFilter(dateTimeFilter, today, null);
+        }
 
 
         function getNumberOfMonths(firstDateTime, lastDateTime) {
@@ -151,16 +174,20 @@
             var lastDateTime = angular.copy(firstDateTime);
             lastDateTime.setDate(daysInMonth[lastDateTime.getMonth()]);
             lastDateTime.setHours(23, 59, 59, 999);
-            filterList.push({
+            var filter = {
                 index: index,
-                dateRangeList: [
+                dateTimeRangeList: [
                     {
                         firstDateTime: firstDateTime,
                         lastDateTime: lastDateTime,
                     }
                 ],
                 dateTimeEquality: [true, true]
-            })
+            }            
+            if (isTodayIncluded(firstDateTime, lastDateTime)) {
+                addInStoreFilter(filter);
+            }
+            filterList.push(filter);
         }
 
         function getMonthLabels(firstDateTime, lastDateTime) {
@@ -255,17 +282,20 @@
             //    monthList.push(monthList[0]);
             //}
             lastDateTime.setHours(23, 59, 59, 999);
-
-            filterList.push({
+            var filter = {
                 index: index,
-                dateRangeList: [
+                dateTimeRangeList: [
                     {
                         firstDateTime: firstDateTime,
                         lastDateTime: lastDateTime,
                     }
                 ],
-                dateTimeEquality: [true, true]                
-            })
+                dateTimeEquality: [true, true]
+            };
+            if (isTodayIncluded(firstDateTime, lastDateTime)) {
+                addInStoreFilter(filter);
+            }
+            filterList.push(filter);
         }
 
         function getWeekLabels(firstDateTime, lastDateTime) {
@@ -323,16 +353,20 @@
         function createDayFilter(filterList, firstDateTime, index) {
             var lastDateTime = angular.copy(firstDateTime);
             lastDateTime.setHours(23, 59, 59, 999);
-            filterList.push({
+            var filter = {
                 index: index,
-                dateRangeList: [
+                dateTimeRangeList: [
                     {
                         firstDateTime: firstDateTime,
                         lastDateTime: lastDateTime,
                     }
                 ],
                 dateTimeEquality: [true, true]
-            })
+            }
+            if (isTodayIncluded(firstDateTime, lastDateTime)) {
+                addInStoreFilter(filter);
+            }
+            filterList.push(filter);
         }
 
         function getDayLabels(firstDateTime, lastDateTime) {
@@ -344,6 +378,16 @@
         function getDayFilters(firstDateTime, lastDateTime) {
             var dateFilters = [];
             loopDays(firstDateTime, getNumberOfDays(firstDateTime, lastDateTime), createDayFilter, dateFilters);
+            return dateFilters;
+        }
+
+        function getTodayFilter() {
+            var dateFilters = [];
+            var today = new Date();
+            var firstDateTime = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+            createDayFilter(dateFilters, firstDateTime, 0);
+            addInStoreFilter(dateFilters[0]);
+
             return dateFilters;
         }
 
@@ -392,16 +436,20 @@
         function createHourFilter(filterList, firstDateTime, index) {
             var lastDateTime = angular.copy(firstDateTime);
             lastDateTime.setMinutes(59, 59, 999);
-            filterList.push({
+            var filter = {
                 index: index,
-                dateRangeList: [
+                dateTimeRangeList: [
                     {
                         firstDateTime: firstDateTime,
                         lastDateTime: lastDateTime,
                     }
                 ],
                 dateTimeEquality: [true, true]
-            })
+            };
+            //if (isTodayIncluded(firstDateTime, lastDateTime)) {
+            //    addInStoreFilter(filter);
+            //}
+            filterList.push(filter);
         }
 
         function getHourLabels(firstDateTime, lastDateTime) {
@@ -449,7 +497,7 @@
             dateMatrix.map(dateList => {
                 var filter = {
                     index: index,
-                    dateRangeList: [],
+                    dateTimeRangeList: [],
                     dateTimeEquality: [true, true]
                 };
 
@@ -457,12 +505,14 @@
                     var lastDateTime = angular.copy(firstDateTime);
                     lastDateTime.setHours(23, 59, 59, 999);
 
-                    filter.dateRangeList.push({
+                    filter.dateTimeRangeList.push({
                         firstDateTime: firstDateTime,
                         lastDateTime: lastDateTime
                     });
                 });
-
+                if (isTodayIncluded(firstDateTime, lastDateTime)) {
+                    addInStoreFilter(filter);
+                }
                 filterList.push(filter);
                 index = (index + 1) % 7;
             });
@@ -506,14 +556,14 @@
             dateMatrix.map(dateList => {
                 var filter = {
                     index: index,
-                    dateRangeList: []
+                    dateTimeRangeList: []
                 };
 
                 dateList.map(firstDateTime => {
                     var lastDateTime = angular.copy(firstDateTime);
                     lastDateTime.setMinutes(59, 59, 999);
 
-                    filter.dateRangeList.push({
+                    filter.dateTimeRangeList.push({
                         firstDateTime: firstDateTime,
                         lastDateTime: lastDateTime
                     });
@@ -531,20 +581,26 @@
             for (var index = 0; index < 24; index++) {
                 var filter = {
                     index: index,                    
-                    dateRangeList: [],
-                    dateTimeFunction: 'hour',
+                    dateTimeRangeList: [],                    
                     dateTimeEquality: [true, false]
                 };
 
-                filter.dateRangeList.push({
+                filter.dateTimeRangeList.push({
                     firstDateTime: index,
-                    lastDateTime: index + 1
+                    lastDateTime: index + 1,
+                    dateTimeFunction: 'hour'
                 });
-
+                //if (isTodayIncluded(firstDateTime, lastDateTime)) {
+                //    addInStoreFilter(filter);
+                //}
                 filterList.push(filter);
             }                     
 
             return filterList;
+        }
+
+        function getHoursOfTodayFilter() {
+
         }
 
 
@@ -695,7 +751,9 @@
                     return getNumberOfHoursOfDay();
                     break;
             }            
-        }
+        }        
+
+        self.getTodayFilter = getTodayFilter;
 
         return self;
     }

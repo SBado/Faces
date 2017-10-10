@@ -11,11 +11,17 @@
         var self = this;
         var baseUrl = "http://localhost:65233";
 
-        function getAll(endpoint, options) {
-            if (options) {
-                return $http.get(baseUrl + '/' + endpoint + '?' + options);
-            }
-            return $http.get(baseUrl + '/' + endpoint);
+        function getAll(endpoint, options, count) {
+            var _options = options ? '?' + options : '';
+            var _count = count ? '/$count' : ''
+
+            return $http.get(baseUrl + '/' + endpoint + _count + _options);
+
+
+            //if (options) {
+            //    return $http.get(baseUrl + '/' + endpoint + '?' + options);
+            //}
+            //return $http.get(baseUrl + '/' + endpoint);
         }
 
         function createEmptyResponse() {
@@ -29,9 +35,9 @@
             return getAll('StoreTrees', options);
         }
 
-        self.getAllFaces = function (options) {
-            return getAll('Faces', options);
-        }
+        //self.getAllFaces = function (options) {
+        //    return getAll('Faces', options);
+        //}
 
         self._getFaces = function (inDate, cameraList, outDate, dateEquality, filter, groupByList, aggregate, selectList) {
             if (outDate && outDate < inDate) {
@@ -63,28 +69,28 @@
 
             if (outDate) {
                 if (groupByList && aggregate) {
-                    return self.getAllFaces('$apply=filter(' + dateFilter + ' ' + cameraFilter +
+                    return getAll('Faces','$apply=filter(' + dateFilter + ' ' + cameraFilter +
                         ')/groupby((' + groupByList.join(',') +
                         '),aggregate(' + aggregate.property +
                         ' with ' + aggregate.transformation +
                         ' as ' + aggregate.alias + '))');
                 }
-                return self.getAllFaces('$filter=' + dateFilter + ' ' + cameraFilter + select);
+                return getAll('Faces','$filter=' + dateFilter + ' ' + cameraFilter + select);
             }
             else {
                 if (groupByList && aggregate) {
-                    return self.getAllFaces('$apply=filter(ExitTimestamp eq null and ' + dateFilter + ' ' + cameraFilter +
+                    return getAll('Faces','$apply=filter(ExitTimestamp eq null and ' + dateFilter + ' ' + cameraFilter +
                         ')/groupby((' + groupByList.join(',') +
                         '),aggregate(' + aggregate.property +
                         ' with ' + aggregate.transformation +
                         ' as ' + aggregate.alias + '))');
                 }
-                return self.getAllFaces('$filter=ExitTimestamp eq null and ' + dateFilter + ' ' + cameraFilter + select);
+                return getAll('Faces','$filter=ExitTimestamp eq null and ' + dateFilter + ' ' + cameraFilter + select);
             }
 
         }
 
-        self.getFaces = function (dateTimeRangeList, cameraList, dateTimeEquality, dateTimeFunction, filter, groupByList, aggregate, selectList) {
+        self.getFaces = function (dateTimeRangeList, cameraList, dateTimeEquality, filter, groupByList, aggregate, selectList, count) {
             var cameraFilter = '';
             cameraList.map(camera => {
                 if (cameraFilter) {
@@ -99,7 +105,8 @@
             var dateTimeFilter = '';
             dateTimeRangeList.map(range => {
                 var firstDateTime = range.firstDateTime;
-                var lastDateTime = range.lastDateTime;                
+                var lastDateTime = range.lastDateTime;
+                var dateTimeFunction = range.dateTimeFunction;
                 if (lastDateTime && lastDateTime < firstDateTime) {
                     return;
                 } 
@@ -143,25 +150,28 @@
 
 
             if (groupByList && aggregate) {
-                return self.getAllFaces('$apply=filter((' + dateTimeFilter + ') and (' + cameraFilter +
+                return getAll('Faces','$apply=filter((' + dateTimeFilter + ') and (' + cameraFilter +
                     '))/groupby((' + groupByList.join(',') +
                     '),aggregate(' + aggregate.property +
                     ' with ' + aggregate.transformation +
-                    ' as ' + aggregate.alias + '))');
+                    ' as ' + aggregate.alias + '))', count);
             }
-            return self.getAllFaces('$filter=(' + dateTimeFilter + ') and (' + cameraFilter + ')' + select);
+            return getAll('Faces','$filter=(' + dateTimeFilter + ') and (' + cameraFilter + ')' + select, count);
         }
 
-        self.getFacesInStore = function (dateTimeRangeList, cameraList) {
-            return self.getFaces(dateTimeRangeList, cameraList, [true]);
-        }
+        self.getFacesInStore = function (cameraList) {
+            var today = new Date();
+            return self.getFaces([{
+                firstDateTime: new Date(today.getFullYear(), today.getMonth(), today.getDate())
+            }], cameraList, [true]);
+        }        
 
         self.getBaskets = function (options) {
             return getAll('Baskets', options);
         }
 
         self.getBasketsCount = function (options) {
-            return getAll('Baskets/$count', options);
+            return getAll('Baskets', options, true);
         }
 
         self.getBasketsInStore = function (zones) {
