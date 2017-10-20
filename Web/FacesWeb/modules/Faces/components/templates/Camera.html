@@ -1,34 +1,28 @@
 ﻿<div class="container-fluid">
     <div style="padding:0px 10px 10px 10px; background-color:antiquewhite; margin-top:10px;">
         <div class="row">
-            <div class="col-sm-12"><h4 style="text-align:center; font:bold;">{{$ctrl.cameraName}}</h4></div>
+            <div class="col-xs-12"><h4 style="text-align:center; font:bold;">{{$ctrl.cameraName}}</h4></div>
         </div>
         <div class="row">
-            <div class="col-sm-6">
-                <img ng-src="{{$ctrl.imagePath}}" />
+            <div class="col-xs-12 col-md-6" style="text-align: center">
+                <img ng-src="{{$ctrl.imagePath}}" style="width:50%; margin-top:5px; margin-bottom:10px;"/>
                 <!--<i class="material-icons" style="font-size: 150px !important;" ng-style="{'color': $ctrl.cameraColor}">videocam</i>-->
             </div>
-            <div class="col-sm-6" style="padding-top: 1%;">
-                <!--<div class="row">
-                    <div class="col-sm-4"><label>Nome:</label></div>
-                    <div class="col-sm-8">{{$ctrl.cameraName}}</div>
-                </div>-->
+            <div class="col-xs-12 col-md-6" style="padding-top: 1%;">               
                 <div class="row">
-                    <div class="col-sm-4"><label>Stato:</label></div>
-                    <div class="col-sm-8">{{$ctrl.cameraStatus}}</div>
+                    <div class="col-xs-6 col-md-7"><label>Stato:</label></div>
+                    <div class="col-xs-6 col-md-5">{{$ctrl.cameraStatus}}</div>
                 </div>
                 <div class="row">
-                    <div class="col-sm-12"><label>Volti Registrati:</label></div>
+                    <div class="col-xs-12"><label>Volti Registrati:</label></div>
                 </div>
-                <div class="row">
-                    <div class="col-sm-1"></div>
-                    <div class="col-sm-4"><label>Oggi</label></div>
-                    <div class="col-sm-3">{{$ctrl.todayRecordedFaces}}</div>
+                <div class="row">                    
+                    <div class="col-xs-6 col-md-7" style="text-align:center"><label>Oggi</label></div>
+                    <div class="col-xs-6 col-md-5">{{$ctrl.todayRecordedFaces}}</div>
                 </div>
-                <div class="row">
-                    <div class="col-sm-1"></div>
-                    <div class="col-sm-4"><label>Totale</label></div>
-                    <div class="col-sm-3">{{$ctrl.totalRecordedFaces}}</div>
+                <div class="row">                    
+                    <div class="col-xs-6 col-md-7" style="text-align:center"><label>Totale</label></div>
+                    <div class="col-xs-6 col-md-5">{{$ctrl.totalRecordedFaces}}</div>
                 </div>
             </div>
         </div>
