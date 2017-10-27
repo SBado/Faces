@@ -82,7 +82,7 @@
 
             _subscription = StoreTreeService.subscribe(reload);
 
-            if (StoreTreeService.getContext()) {
+            if (StoreTreeService.getContext()) {                
                 reload();
             }
         }
@@ -137,7 +137,7 @@
             //$ctrl.reload();
         }
 
-        function reload() {
+        function reload() {            
 
             var context = StoreTreeService.getContext();
 
@@ -149,7 +149,7 @@
                 return;
             }
 
-            $ctrl.loading = true;
+            $ctrl.loading = true;            
 
             $ctrl.data = [];
             $ctrl.labels = [];
@@ -175,8 +175,7 @@
                             }],
                                 context.cameras,
                                 [true, true],
-                                null,
-                                null,
+                                null,                                
                                 [$ctrl.selectedCharacteristic.id],
                                 { property: 'ID', transformation: 'countdistinct', alias: 'total' }
                             ).then(function (response) {
@@ -303,7 +302,7 @@
             }
 
             $q.all(promiseList).then(function () {
-                $ctrl.loading = false;
+                $ctrl.loading = false;                
             })
 
 
@@ -313,9 +312,71 @@
             _subscription.dispose();
         }
 
+        function exportToExcel() {
+
+            // Prepare Excel data:            
+            var fileName = $ctrl.firstDateTime.toLocaleDateString().replace(/\//g, '-') + ' - ' + $ctrl.lastDateTime.toLocaleDateString().replace(/\//g, '-');
+            var sheetName = fileName;
+            var exportData = [];            
+            // Headers:
+            var headers = angular.copy($ctrl.labels);
+
+            if ($ctrl.selectedChartType.type == 'single') {
+                //Data:
+                var data = angular.copy($ctrl.data)
+                exportData.push(headers);
+                exportData.push(data);                
+            }
+
+            else {
+                headers.unshift("");
+                exportData.push(headers);
+                for (var s = 0; s < $ctrl.series.length; s++) {
+                    var row = [];
+                    row.push($ctrl.series[s]);
+                    var dataMaxLength = Math.max.apply(Math, $ctrl.data.map(function (arr) { return arr.length; }))
+                    for (var d = 0; d < dataMaxLength; d++) {
+                        row.push($ctrl.data[s][d] || 0);
+                    }
+                    exportData.push(angular.copy(row));                   
+                }
+            }
+
+            return {
+                fileName: fileName,
+                sheetName: sheetName,
+                exportData: exportData
+            }
+
+            //var jsonToExport = [
+            //    {
+            //        "col1data": "1",
+            //        "col2data": "Fight Club",
+            //        "col3data": "Brad Pitt"
+            //    },
+            //    {
+            //        "col1data": "2",
+            //        "col2data": "Matrix (Series)",
+            //        "col3data": "Keanu Reeves"
+            //    },
+            //    {
+            //        "col1data": "3",
+            //        "col2data": "V for Vendetta",
+            //        "col3data": "Hugo Weaving"
+            //    }
+            //];
+
+
+            //// Data:
+            //angular.forEach(jsonToExport, function (value, key) {
+            //    $ctrl.exportData.push([value.col1data, value.col2data, value.col3data]);
+            //});
+        }
+
         $ctrl.$onInit = init;
         $ctrl.$onDestroy = clean;
         $ctrl.changeChartType = changeChartType;
         $ctrl.reload = reload;
+        $ctrl.exportToExcel = exportToExcel;
     }
 })();

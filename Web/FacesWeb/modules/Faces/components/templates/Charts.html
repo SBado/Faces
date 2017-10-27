@@ -1,22 +1,22 @@
-﻿<div class="container-fluid">
+﻿<div class="container-fluid">    
     <div class="row">
         <div class="col-xs-12 col-md-2">
             <div class="flexbox-column-left" style="margin-top:25%;">
                 <label>Tipo Grafico:</label>
-                <md-select ng-model="$ctrl.selectedChartType" ng-change="$ctrl.changeChartType(); $ctrl.reload()">
+                <md-select ng-model="$ctrl.selectedChartType" ng-change="$ctrl.changeChartType(); $ctrl.reload()" ng-disabled="$ctrl.loading">
                     <md-option ng-repeat="c in $ctrl.chartTypes" ng-value="c">{{ c.label }}</md-option>
                 </md-select>
 
                 <div ng-if="$ctrl.selectedChartType">
                     <label>Selezione:</label>
-                    <md-select ng-model="$ctrl.selectedQueryType" ng-change="$ctrl.reload()">
+                    <md-select ng-model="$ctrl.selectedQueryType" ng-change="$ctrl.reload()" ng-disabled="$ctrl.loading">
                         <md-option ng-repeat="q in $ctrl.queryTypes" ng-value="q">{{ q.label }}</md-option>
                     </md-select>
                 </div>
 
                 <div ng-if="$ctrl.selectedQueryType && $ctrl.selectedQueryType.id == 's'">
                     <label>Caratteristica:</label>
-                    <md-select ng-model="$ctrl.selectedCharacteristic" ng-change="$ctrl.reload()">
+                    <md-select ng-model="$ctrl.selectedCharacteristic" ng-change="$ctrl.reload()" ng-disabled="$ctrl.loading">
                         <md-option ng-repeat="c in $ctrl.characteristics" ng-value="c">{{ c.name }}</md-option>
                     </md-select>
                 </div>
@@ -24,7 +24,7 @@
                 <div ng-if="$ctrl.selectedQueryType && $ctrl.selectedQueryType.id == 'm'">
                     <label>Caratteristica:</label>
                     <div ng-repeat="c in $ctrl.characteristics">
-                        <md-checkbox ng-checked="c.selected" ng-click="c.selected = !c.selected; $ctrl.reload()">
+                        <md-checkbox ng-checked="c.selected" ng-click="c.selected = !c.selected; $ctrl.reload()" ng-disabled="$ctrl.loading">
                             {{ c.name }}
                         </md-checkbox>
                     </div>
@@ -44,15 +44,17 @@
         <div class="col-xs-12 col-md-2">
             <div class="flexbox-column-left" style="margin-top:25%;">
                 <label>Da:</label>
-                <md-datepicker ng-model="$ctrl.firstDateTime" ng-change="$ctrl.reload()"></md-datepicker>
+                <md-datepicker ng-model="$ctrl.firstDateTime" ng-change="$ctrl.reload()" ng-disabled="$ctrl.loading"></md-datepicker>
                 <br />
                 <label>A:</label>
-                <md-datepicker ng-model="$ctrl.lastDateTime" ng-change="$ctrl.reload()"></md-datepicker>
+                <md-datepicker ng-model="$ctrl.lastDateTime" ng-change="$ctrl.reload()" ng-disabled="$ctrl.loading"></md-datepicker>
                 <br />
                 <label ng-if="$ctrl.selectedChartType.type == 'many'">Dettaglio:</label>
-                <md-select style="margin-left:20px;" ng-model="$ctrl.selectedTemporalDetail" ng-change="$ctrl.reload()" ng-if="$ctrl.selectedChartType.type == 'many'">
+                <md-select style="margin-left:20px;" ng-model="$ctrl.selectedTemporalDetail" ng-change="$ctrl.reload()" ng-disabled="$ctrl.loading" ng-if="$ctrl.selectedChartType.type == 'many'">
                     <md-option ng-repeat="d in $ctrl.temporalDetails" ng-value="d">{{ d.label }}</md-option>
                 </md-select>
+                <br />
+                <div excel-export disabled="$ctrl.loading" load-data="$ctrl.exportToExcel()"></div>                
             </div>
         </div>
     </div>
