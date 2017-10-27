@@ -54,7 +54,7 @@
             $ctrl.charts = {};
             $ctrl.charts['Sex'] = {
                 id: 'sex',
-                labels: ['Maschi', 'Femmine'],
+                labels: ['Femmine', 'Maschi'],
             };
             $ctrl.charts['Age'] = {
                 id: 'age',
@@ -78,6 +78,7 @@
             });
 
             $ctrl.charts.Sex.options.title.text = 'Sesso';
+            $ctrl.charts.Sex.colors = ["rgba(255,192,203,1)", "rgba(0,0,255,1)"];
             $ctrl.charts.Age.options.title.text = 'Età';
             //$ctrl.charts.Glasses.options.title.text = 'Occhiali';
             //$ctrl.charts.Beard.options.title.text = 'Barba';
@@ -160,7 +161,7 @@
                     var adults = $filter('filter')(_faces, UtilityService.betweenPredicate('Age', 19, 60, false, true)).length;
                     var elders = $filter('filter')(_faces, UtilityService.greaterThanPredicate('Age', 60)).length;
 
-                    setChartValues($ctrl.charts.Sex, [males, females]);
+                    setChartValues($ctrl.charts.Sex, [females, males]);
                     //setChartValues($ctrl.charts.Glasses, [glasses, noGlasses]);
                     //setChartValues($ctrl.charts.Beard, [beard, mustaches, nothing]);
                     setChartValues($ctrl.charts.Age, [children, teens, adults, elders]);
