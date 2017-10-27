@@ -54,20 +54,19 @@
                     position: 'bottom'
                 },
                 responsive: true,
-                maintainAspectRatio: false,
+                maintainAspectRatio: false        
             }
             $ctrl.labels = [];
             $ctrl.data = [];
             $ctrl.series = [];
-            $ctrl.characteristics = [
-                //{ id: 'Gender', name: 'Sesso', labels: ['Donne', 'Uomini'], possibleValues: ['F', 'M'], canGroup: true, selected: false },
-                { id: 'Gender', name: 'Sesso', labels: ['Donne', 'Uomini'], possibleValues: [{ values: ['F'], operators: '==' }, { values: ['M'], operators: '==' }], canGroup: true, selected: false },
-                { id: 'Age', name: 'Età', labels: ['0-10', '10-20', '20-30', '30-40', '40-50', '50-60', '60-70', '70+'], possibleValues: [{ values: [0, 10], operators: '<,<=' }, { values: [10, 20], operators: '<,<=' }, { values: [20, 30], operators: '<,<=' }, { values: [30, 40], operators: '<,<=' }, { values: [40, 50], operators: '<,<=' }, { values: [50, 60], operators: '<,<=' }, { values: [60, 70], operators: '<,<=' }, { values: [70], operators: '>' }], canGroup: false, selected: false },
-                //{ id: 'Eyeglasses', name: 'Occhiali', labels: ['Con occhiali', 'Senza occhiali'], possibleValues: [true, false], canGroup: true, selected: false  },
+            $ctrl.colors = ["rgba(255,0,0,1)", "rgba(0,0,255,1)",];
+            $ctrl.characteristics = [                
+                { id: 'Gender', name: 'Sesso', labels: ['Donne', 'Uomini'], colors: ["rgba(255,192,203,1)", "rgba(0,0,255,1)"], possibleValues: [{ values: ['F'], operators: '==' }, { values: ['M'], operators: '==' }], canGroup: true, selected: false },
+                { id: 'Age', name: 'Età', labels: ['0-10', '10-20', '20-30', '30-40', '40-50', '50-60', '60-70', '70+'], colors: ["rgba(255,255,0,1)", "rgba(255,165,0,1)", "rgba(165,42,42,1)", "rgba(255,0,0,1)", "rgba(0,0,153,1)", "rgba(102,51,0,1)", "rgba(255,80,80,1)", "rgba(0,0,0,1)"], possibleValues: [{ values: [0, 10], operators: '<,<=' }, { values: [10, 20], operators: '<,<=' }, { values: [20, 30], operators: '<,<=' }, { values: [30, 40], operators: '<,<=' }, { values: [40, 50], operators: '<,<=' }, { values: [50, 60], operators: '<,<=' }, { values: [60, 70], operators: '<,<=' }, { values: [70], operators: '>' }], canGroup: false, selected: false },                
                 { id: 'Eyeglasses', name: 'Occhiali', labels: ['Con occhiali', 'Senza occhiali'], possibleValues: [{ values: [true], operators: '==' }, { values: [false], operators: '==' }], canGroup: true, selected: false },
                 { id: 'Mustaches', name: 'Baffi', labels: ['Con baffi', 'Senza baffi'], possibleValues: [{ values: [0], operators: '==' }, { values: [0, 1], operators: '<,<=' }], canGroup: false, selected: false },
                 { id: 'Beard', name: 'Barba', labels: ['Con barba', 'Senza barba'], possibleValues: [{ values: [0], operators: '==' }, { values: [0, 1], operators: '<,<=' }], canGroup: false, selected: false }
-            ]
+            ]            
             //$ctrl.selectedCharacteristic = $ctrl.characteristics[0];
 
             $ctrl.firstDateTime = new Date();
@@ -153,10 +152,11 @@
 
             $ctrl.data = [];
             $ctrl.labels = [];
-            $ctrl.series = [];
+            $ctrl.series = []; 
+            //$ctrl.colors = $ctrl.selectedCharacteristic.colors || $ctrl.colors;
 
             if ($ctrl.selectedChartType.type == 'single') {
-                $ctrl.labels = angular.copy($ctrl.selectedCharacteristic.labels);
+                $ctrl.labels = angular.copy($ctrl.selectedCharacteristic.labels);                
             }
             else {
                 $ctrl.labels = ChartService.getLabels($ctrl.firstDateTime, $ctrl.lastDateTime, $ctrl.selectedTemporalDetail.id);
@@ -167,6 +167,7 @@
 
             switch ($ctrl.selectedQueryType.id) {
                 case 's':
+                    $ctrl.colors = $ctrl.selectedCharacteristic.colors
                     if ($ctrl.selectedChartType.type == 'single') {
                         if ($ctrl.selectedCharacteristic.canGroup) {
                             promiseList.push(OdataService.getFaces([{
@@ -269,6 +270,7 @@
                     var selectedCharacteristicList = $filter('filter')($ctrl.characteristics, { selected: true });
                     var selectList = [];
                     selectedCharacteristicList.map(c => {
+                        $ctrl.colors.concat(c.colors);
                         $ctrl.series.push.apply($ctrl.series, c.labels);
                         selectList.push(c.id);
                     })

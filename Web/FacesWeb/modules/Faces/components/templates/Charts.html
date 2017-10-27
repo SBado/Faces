@@ -35,10 +35,10 @@
             <div class="content-overlay flexbox-row" ng-show="$ctrl.loading">
                 <md-progress-circular md-mode="indeterminate"></md-progress-circular>
             </div>
-            <div style="position: relative; height: 75vh; background-color:antiquewhite;">
+            <div style="position: relative; height: 75vh;" class="md-whiteframe-2dp">
                 <canvas id="barChart" class="chart chart-base" chart-type="$ctrl.selectedChartType.id"
                         chart-data="$ctrl.data" chart-labels="$ctrl.labels"
-                        chart-series="$ctrl.series" chart-options="$ctrl.options"></canvas>
+                        chart-series="$ctrl.series" chart-options="$ctrl.options" chart-colors="$ctrl.colors"></canvas>
             </div>
         </div>
         <div class="col-xs-12 col-md-2">
